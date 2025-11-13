@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sprint4_app/image_labeling_channel.dart';
@@ -15,9 +14,10 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
   File? _imageFile;
   final _picker = ImagePicker();
   List<LabeledImage>? _labeledImages;
+  ImageSource _imageSource = ImageSource.gallery;
 
   _pickImage() async {
-    final pickedImage = await _picker.pickImage(source: ImageSource.gallery);
+    final pickedImage = await _picker.pickImage(source: _imageSource);
 
     if (pickedImage != null) {
       _imageFile = File(pickedImage.path);
@@ -37,8 +37,28 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
     List<Widget> all = [];
 
     for (var labeledImage in _labeledImages!) {
-      all.add(Text(labeledImage.text));
-      all.add(Text(labeledImage.confidence));
+      all.add(Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            labeledImage.text,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold
+            ),
+          ),
+
+          Text(
+            labeledImage.confidence,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.normal
+            ),
+          )
+        ],
+      ));
+
+      all.add(SizedBox(height: 10));
     }
 
     return all;
@@ -47,27 +67,62 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Image Picker'),),
-      body: Column(
-        children: [
-          Center(
-            child: _imageFile == null
-              ? const Text('No image selected')
-              : Image.file(
-                _imageFile!,
-                width: 200,
-                height: 200,
-                fit: BoxFit.cover,
+      appBar: AppBar(title: const Text('Image picker')),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+        child: _imageFile == null
+            ? Center(
+              child: const Text(
+                'No image selected',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold
+                ),
               ),
-          ),
+            )
+            : SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Image.file(
+                      _imageFile!,
+                      width: 200,
+                      height: 200,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
 
-          if (_imageFile != null)
-            ..._getLabeledImagesWidget()
-        ],
+                  SizedBox(height: 20),
+
+                  ..._getLabeledImagesWidget()
+                ],
+              ),
+            )
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _pickImage(),
-        child: Icon(Icons.camera_alt),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            FloatingActionButton(
+              onPressed: () {
+                setState(() => _imageSource = ImageSource.camera);
+                _pickImage();
+              },
+              child: Icon(Icons.camera_alt),
+            ),
+        
+            FloatingActionButton(
+              onPressed: () {
+                setState(() => _imageSource = ImageSource.gallery);
+                _pickImage();
+              },
+              child: Icon(Icons.photo),
+            )
+          ],
+        ),
       ),
     );
   }
