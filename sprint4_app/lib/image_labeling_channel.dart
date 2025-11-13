@@ -21,16 +21,20 @@ class ImageLabelingChannel {
 
 class LabeledImage {
   final String text;
-  final double confidence;
+  final String confidence;
   final int index;
 
   const LabeledImage({required this.text, required this.confidence, required this.index});
 
   factory LabeledImage.fromMap(Map<String, dynamic> map) {
+    final text = map['text'];
+    final confidence = '${(map['confidence'] * 100).toStringAsFixed(2)}%';
+    final index = map['index'];
+
     return LabeledImage(
-      text: map['text'], 
-      confidence: map['confidence'], 
-      index: map['index']
+      text: text, 
+      confidence: confidence, 
+      index: index
     );
   }
 }
