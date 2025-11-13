@@ -45,12 +45,23 @@ class MainActivity : FlutterActivity() {
             }
 
             val image = InputImage.fromBitmap(bitmap, 0)
-            val labeler = ImageLabeling.getClient(ImageLabelerOptions.DEFAULT_OPTIONS)
+            var labeler = ImageLabeling.getClient(
+                ImageLabelerOptions.Builder()
+                    .setConfidenceThreshold(0.5f)
+                    .build()
+            )
 
             labeler.process(image)
                 .addOnSuccessListener { labels ->
-                    val texts = labels.map { it.text }
-                    result.success(texts)
+                    val labelData = labels.map { label ->
+                        mapOf(
+                            "text" to label.text,
+                            "confidence" to label.confidence,
+                            "index" to label.index
+                        )
+                    }
+
+                    result.success(labelData)
                 }
                 .addOnFailureListener { error ->
                     result.error("ML_KIT_ERROR", error.localizedMessage, null)

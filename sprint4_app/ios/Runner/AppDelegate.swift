@@ -84,8 +84,15 @@ import MLKitImageLabeling
                 return
             }
             
-            let texts = labels.map { $0.text }
-            result(texts)
+            let labelData = labels.map { label in
+                return [
+                    "text": label.text,
+                    "confidence": label.confidence,
+                    "index": label.index
+                ] as [String : Any]
+            }
+            
+            result(labelData)
         }
     }
 }

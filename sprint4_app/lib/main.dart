@@ -6,8 +6,8 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   final String imagePath = 'images/example_img.jpg';
-  final foo = await ImageLabelingChannel.labelImage(imagePath);
-  print(foo);
+  final labeledImages = await ImageLabelingChannel.labelImage(imagePath);
+  print(labeledImages);
 
   runApp(const MyApp());
 }
