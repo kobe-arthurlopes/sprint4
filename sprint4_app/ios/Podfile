@@ -29,6 +29,7 @@ flutter_ios_podfile_setup
 
 target 'Runner' do
   use_frameworks!
+  pod 'GoogleMLKit/ImageLabeling', '8.0.0'
 
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
   target 'RunnerTests' do
@@ -40,7 +41,6 @@ $iOSVersion = '15.5'  # or newer version
 
 post_install do |installer|
   installer.pods_project.build_configurations.each do |config|
-    config.build_settings["EXCLUDED_ARCHS[sdk=*]"] = "armv7"
     config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = $iOSVersion
   end
 
