@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/services.dart';
 
@@ -19,6 +20,18 @@ class ImageLabelingService {
         .toList();
 
     return ImageLabelResult(predictions: predictions, file: file);
+  }
+
+  static Future<List<Label>> fetchLabelsFromJson() async {
+    try {
+      final jsonString = await rootBundle.loadString('lib/labels.json');
+      final data = json.decode(jsonString);
+      final maps = (data as List).cast<Map<String, dynamic>>();
+      return maps.map((element) => Label.fromMap(element)).toList();
+    } catch (error) {
+      print('error loading labels.json -> $error');
+      return [];
+    }
   }
 }
 
@@ -42,9 +55,9 @@ class Prediction {
   });
 
   factory Prediction.fromMap(Map<String, dynamic> map) {
-    final labelText = map['text'];
     final labelIndex = map['index'];
-    final Label label = Label(text: labelText, index: labelIndex);
+    final labelText = map['text'];
+    final Label label = Label(index: labelIndex, text: labelText);
     final confidenceDecimal = map['confidence'];
     final confidenceText = '${(confidenceDecimal * 100).toStringAsFixed(2)}%';
 
@@ -57,8 +70,12 @@ class Prediction {
 }
 
 class Label {
-  final String text;
   final int index;
+  final String text;
 
-  Label({required this.text, required this.index});
+  Label({required this.index, required this.text});
+
+  factory Label.fromMap(Map<String, dynamic> map) {
+    return Label(index: map['index'], text: map['text']);
+  }
 }
