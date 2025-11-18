@@ -28,22 +28,22 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
   }
 
   List<Widget> _getLabeledImagesWidget() {
-    if (imageLabelResult.labels.isEmpty) return [];
+    if (imageLabelResult.predictions.isEmpty) return [];
 
     List<Widget> all = [];
 
-    for (var label in imageLabelResult.labels) {
+    for (var prediction in imageLabelResult.predictions) {
       all.add(
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              label.text,
+              prediction.label.text,
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
 
             Text(
-              label.confidenceText,
+              prediction.confidenceText,
               style: TextStyle(fontSize: 14, fontWeight: FontWeight.normal),
             ),
           ],

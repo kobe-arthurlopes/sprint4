@@ -12,63 +12,53 @@ class ImageLabelingService {
     final list = bytes.buffer.asUint8List();
     final result = await _channel.invokeMethod('labelImage', {'bytes': list});
 
-    final labels = (result as List)
+    final predictions = (result as List)
         .map(
-          (element) => ImageLabel.fromMap(Map<String, dynamic>.from(element)),
+          (element) => Prediction.fromMap(Map<String, dynamic>.from(element)),
         )
         .toList();
 
-    return ImageLabelResult(labels: labels, file: file);
-  }
-
-  static Future<List<ImageLabel>> labelImage(String assetPath) async {
-    final bytes = await rootBundle.load(assetPath);
-    final list = bytes.buffer.asUint8List();
-
-    final result = await _channel.invokeMethod('labelImage', {'bytes': list});
-
-    final labeledImages = (result as List)
-        .map(
-          (element) => ImageLabel.fromMap(Map<String, dynamic>.from(element)),
-        )
-        .toList();
-
-    return labeledImages;
+    return ImageLabelResult(predictions: predictions, file: file);
   }
 }
 
 class ImageLabelResult {
-  List<ImageLabel> labels;
+  List<Prediction> predictions;
   File? file;
 
-  ImageLabelResult({List<ImageLabel>? labels, this.file})
-    : labels = labels ?? [];
+  ImageLabelResult({List<Prediction>? predictions, this.file})
+    : predictions = predictions ?? [];
 }
 
-class ImageLabel {
-  final String text;
+class Prediction {
+  final Label label;
   final double confidenceDecimal;
   final String confidenceText;
-  final int index;
 
-  const ImageLabel({
-    required this.text,
+  Prediction({
+    required this.label,
     required this.confidenceDecimal,
     required this.confidenceText,
-    required this.index,
   });
 
-  factory ImageLabel.fromMap(Map<String, dynamic> map) {
-    final text = map['text'];
+  factory Prediction.fromMap(Map<String, dynamic> map) {
+    final labelText = map['text'];
+    final labelIndex = map['index'];
+    final Label label = Label(text: labelText, index: labelIndex);
     final confidenceDecimal = map['confidence'];
     final confidenceText = '${(confidenceDecimal * 100).toStringAsFixed(2)}%';
-    final index = map['index'];
 
-    return ImageLabel(
-      text: text,
+    return Prediction(
+      label: label,
       confidenceDecimal: confidenceDecimal,
       confidenceText: confidenceText,
-      index: index,
     );
   }
+}
+
+class Label {
+  final String text;
+  final int index;
+
+  Label({required this.text, required this.index});
 }
