@@ -4,8 +4,8 @@ import 'package:flutter/services.dart';
 class ImageLabelingService {
   static const _channel = MethodChannel('com.sprint4/image_labeling');
 
-  static Future<LabeledImage> getLabeledImage(File? file) async {
-    if (file == null) return LabeledImage();
+  static Future<ImageLabelResult> getLabeledImage(File? file) async {
+    if (file == null) return ImageLabelResult();
 
     final assetPath = file.path;
     final bytes = await rootBundle.load(assetPath);
@@ -18,7 +18,7 @@ class ImageLabelingService {
         )
         .toList();
 
-    return LabeledImage(labels: labels, file: file);
+    return ImageLabelResult(labels: labels, file: file);
   }
 
   static Future<List<ImageLabel>> labelImage(String assetPath) async {
@@ -37,11 +37,12 @@ class ImageLabelingService {
   }
 }
 
-class LabeledImage {
+class ImageLabelResult {
   List<ImageLabel> labels;
   File? file;
 
-  LabeledImage({List<ImageLabel>? labels, this.file}) : labels = labels ?? [];
+  ImageLabelResult({List<ImageLabel>? labels, this.file})
+    : labels = labels ?? [];
 }
 
 class ImageLabel {

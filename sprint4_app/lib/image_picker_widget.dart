@@ -11,7 +11,7 @@ class ImagePickerWidget extends StatefulWidget {
 }
 
 class _ImagePickerWidgetState extends State<ImagePickerWidget> {
-  LabeledImage _labeledImage = LabeledImage();
+  ImageLabelResult imageLabelResult = ImageLabelResult();
   final _picker = ImagePicker();
   ImageSource _imageSource = ImageSource.gallery;
 
@@ -21,18 +21,18 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
     if (pickedImage != null) {
       final imageFile = File(pickedImage.path);
 
-      _labeledImage = await ImageLabelingService.getLabeledImage(imageFile);
+      imageLabelResult = await ImageLabelingService.getLabeledImage(imageFile);
 
       setState(() {});
     }
   }
 
   List<Widget> _getLabeledImagesWidget() {
-    if (_labeledImage.labels.isEmpty) return [];
+    if (imageLabelResult.labels.isEmpty) return [];
 
     List<Widget> all = [];
 
-    for (var label in _labeledImage.labels) {
+    for (var label in imageLabelResult.labels) {
       all.add(
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -62,7 +62,7 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
       appBar: AppBar(title: const Text('Image picker')),
       body: Padding(
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-        child: _labeledImage.file == null
+        child: imageLabelResult.file == null
             ? Center(
                 child: const Text(
                   'No image selected',
@@ -75,7 +75,7 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
                   children: [
                     Center(
                       child: Image.file(
-                        _labeledImage.file!,
+                        imageLabelResult.file!,
                         width: 200,
                         height: 200,
                         fit: BoxFit.cover,
