@@ -36,11 +36,19 @@ class ImageLabelingService {
 }
 
 class ImageLabelResult {
+  final int id;
   List<Prediction> predictions;
   File? file;
 
-  ImageLabelResult({List<Prediction>? predictions, this.file})
-    : predictions = predictions ?? [];
+  ImageLabelResult({int? id, List<Prediction>? predictions, this.file})
+    : id = id ?? 0, predictions = predictions ?? [];
+
+  factory ImageLabelResult.fromMap(Map<String, dynamic> map) {
+    return ImageLabelResult(
+      id: map['id'],
+      file: File(map['file_path']),
+    );
+  }
 }
 
 class Prediction {
@@ -57,7 +65,7 @@ class Prediction {
   factory Prediction.fromMap(Map<String, dynamic> map) {
     final labelIndex = map['index'];
     final labelText = map['text'];
-    final Label label = Label(index: labelIndex, text: labelText);
+    final Label label = Label(id: labelIndex, text: labelText);
     final confidenceDecimal = map['confidence'];
     final confidenceText = '${(confidenceDecimal * 100).toStringAsFixed(2)}%';
 
@@ -70,12 +78,15 @@ class Prediction {
 }
 
 class Label {
-  final int index;
+  final int id;
   final String text;
 
-  Label({required this.index, required this.text});
+  Label({required this.id, required this.text});
 
   factory Label.fromMap(Map<String, dynamic> map) {
-    return Label(index: map['index'], text: map['text']);
+    return Label(
+      id: map['id'], 
+      text: map['text']
+    );
   }
 }
