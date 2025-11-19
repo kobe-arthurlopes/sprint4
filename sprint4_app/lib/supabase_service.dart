@@ -41,7 +41,25 @@ class SupabaseService {
     }
   }
 
-  Future<void> createImageLabelResult() async {
+  Future<Label?> getLabel({required int id}) async {
+    if (!_isAuthenticated) return null;
+
+    try {
+      final data = await _supabase
+        .from('labels')
+        .select()
+        .eq('id', id)
+        .limit(1);
+
+      final item = data.first;
+      return Label.fromMap(item);
+    } catch (error) {
+      print('error getting label with id $id -> $error');
+      return null;
+    }
+  }
+
+  Future<void> createImageLabelResult({String? filePath}) async {
     if (!_isAuthenticated) return;
 
     final user = _supabase.auth.currentUser;
@@ -51,7 +69,7 @@ class SupabaseService {
     try {
       final data = await _supabase
         .from('image_label_results')
-        .insert({'user_id': user.id, 'file_path': null})
+        .insert({'user_id': user.id, 'file_path': filePath})
         .select()
         .limit(1);
 
@@ -72,50 +90,151 @@ class SupabaseService {
         .from('image_label_results')
         .select();
 
-      return data.map((element) => ImageLabelResult.fromMap(element)).toList();
+      final imageLabelResultFutures = data.map((element) async {
+        var result = ImageLabelResult.fromMap(element);
+        final predictions = await getPredictions(resultId: result.id);
+        result.predictions = predictions;
+        return result;
+      }).toList();
+
+      return await Future.wait(imageLabelResultFutures);
     } catch (error) {
       print('error getting image label results -> $error');
       return [];
     }
   }
 
-  Future<void> updateImageLabelResult(int id, String newFilePath) async {
+  Future<void> updateImageLabelResult({required String id, String? filePath}) async {
     if (!_isAuthenticated) return;
 
     try {
-      final data = await _supabase
+      await _supabase
         .from('image_label_results')
-        .update({'file_path': newFilePath})
-        .eq('id', id)
-        .select()
-        .limit(1);
+        .update({'file_path': filePath})
+        .eq('id', id);
 
-      final item = data.first;
-      final result = ImageLabelResult.fromMap(item);
-
-      print('updated image label result with id ${result.id}');
+      print('updated image label result with id $id');
     } catch (error) {
-      print('error upating image label result -> $error');
+      print('error upating image label result with id $id -> $error');
     }
   }
 
-  Future<void> deleteImageLabelResult(int id) async {
+  Future<void> deleteImageLabelResult({required String id}) async {
+    if (!_isAuthenticated) return;
+
+    try {
+      await _supabase
+        .from('image_label_results')
+        .delete()
+        .eq('id', id);
+
+      print('deleted image label result with id $id');
+    } catch (error) {
+      print('error deleting image label result with id $id -> $error');
+    }
+  }
+
+  Future<void> createPrediction({
+    required String resultId, 
+    required int labelId, 
+    required double confidence
+  }) async {
     if (!_isAuthenticated) return;
 
     try {
       final data = await _supabase
-        .from('image_label_results')
-        .delete()
-        .eq('id', id)
+        .from('predictions')
+        .insert({
+          'result_id': resultId,
+          'label_id': labelId,
+          'confidence': confidence
+        })
         .select()
         .limit(1);
 
       final item = data.first;
-      final result = ImageLabelResult.fromMap(item);
+      final prediction = Prediction.fromDBMap(item);
 
-      print('deleted image label result with id ${result.id}');
+      print('created prediction with id ${prediction.id}');
     } catch (error) {
-      print('error deleting image label result -> $error');
+      print('error creating prediction -> error');
+    }
+  }
+
+  Future<List<Prediction>> getPredictions({String? resultId}) async {
+    if (!_isAuthenticated) return [];
+
+    try {
+      final List<Map<String, dynamic>> data;
+
+      if (resultId != null) {
+        data = await _supabase
+          .from('predictions')
+          .select()
+          .eq('result_id', resultId);
+      } else {
+        data = await _supabase
+          .from('predictions')
+          .select();
+      }
+
+      final predictionFutures = data.map((element) async {
+        final labelId = element['label_id'];
+        final label = await getLabel(id: labelId);
+        element['label'] = label;
+        return Prediction.fromDBMap(element);
+      }).toList();
+
+      return await Future.wait(predictionFutures);
+    } catch (error) {
+      print('error getting predictions -> $error');
+      return [];
+    }
+  }
+
+  Future<void> updatePrediction({
+    required String id,
+    String? resultId, 
+    int? labelId, 
+    double? confidence
+  }) async {
+    if (!_isAuthenticated) return;
+
+    if (resultId == null && labelId == null && confidence == null) {
+      print('no proprerties passed to update prediction with id $id');
+      return;
+    }
+
+    Map<String, dynamic> insertionMap = {};
+
+    if (resultId != null) insertionMap['result_id'] = resultId;
+    if (labelId != null) insertionMap['label_id'] = labelId;
+    if (confidence != null) insertionMap['confidence'] = confidence;
+
+    try {
+      await _supabase
+        .from('predictions')
+        .update(insertionMap)
+        .eq('id', id);
+
+      print('updated prediction with id $id');
+    } catch (error) {
+      print('error updating prediction with id $id -> $error');
+    }
+  }
+
+  Future<void> deletePrediction({required String id}) async {
+    if (!_isAuthenticated) return;
+
+    try {
+      await _supabase
+        .from('predictions')
+        .delete()
+        .eq('id', id);
+
+      print('deleted prediction with id $id');
+    } catch (error) {
+      print('error updating prediction with id $id -> $error');
     }
   }
 }

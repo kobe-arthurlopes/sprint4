@@ -15,7 +15,7 @@ class ImageLabelingService {
 
     final predictions = (result as List)
         .map(
-          (element) => Prediction.fromMap(Map<String, dynamic>.from(element)),
+          (element) => Prediction.fromImageLabelingMap(Map<String, dynamic>.from(element)),
         )
         .toList();
 
@@ -36,33 +36,38 @@ class ImageLabelingService {
 }
 
 class ImageLabelResult {
-  final int id;
+  final String id;
   List<Prediction> predictions;
   File? file;
 
-  ImageLabelResult({int? id, List<Prediction>? predictions, this.file})
-    : id = id ?? 0, predictions = predictions ?? [];
+  ImageLabelResult({String? id, List<Prediction>? predictions, this.file})
+    : id = id ?? '', predictions = predictions ?? [];
 
   factory ImageLabelResult.fromMap(Map<String, dynamic> map) {
+    final filePath = map['file_path'];
+    final file = filePath != null ? File(filePath) : null;
+
     return ImageLabelResult(
       id: map['id'],
-      file: File(map['file_path']),
+      file: file,
     );
   }
 }
 
 class Prediction {
+  final String id;
   final Label label;
   final double confidenceDecimal;
   final String confidenceText;
 
   Prediction({
-    required this.label,
+    String? id,
+    Label? label,
     required this.confidenceDecimal,
     required this.confidenceText,
-  });
+  }) : id = id ?? '', label = label ?? Label();
 
-  factory Prediction.fromMap(Map<String, dynamic> map) {
+  factory Prediction.fromImageLabelingMap(Map<String, dynamic> map) {
     final labelIndex = map['index'];
     final labelText = map['text'];
     final Label label = Label(id: labelIndex, text: labelText);
@@ -75,13 +80,28 @@ class Prediction {
       confidenceText: confidenceText,
     );
   }
+
+  factory Prediction.fromDBMap(Map<String, dynamic> map) {
+    final id = map['id'];
+    final label = map['label'] ?? Label();
+    final confidenceDecimal = map['confidence'];
+    final confidenceText = '${(confidenceDecimal * 100).toStringAsFixed(2)}%';
+
+    return Prediction(
+      id: id,
+      label: label, 
+      confidenceDecimal: confidenceDecimal, 
+      confidenceText: confidenceText
+    );
+  }
 }
 
 class Label {
   final int id;
   final String text;
 
-  Label({required this.id, required this.text});
+  Label({int? id, String? text})
+    : id = id ?? 0, text = text ?? '';
 
   factory Label.fromMap(Map<String, dynamic> map) {
     return Label(
