@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:sprint4_app/image_picker_widget.dart';
+import 'package:provider/provider.dart';
+import 'package:sprint4_app/home/presentation/components/image_picker_widget.dart';
+import 'package:sprint4_app/home/presentation/view_models/home_view_model.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -9,6 +11,19 @@ class HomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<HomePage> {
+  late final HomeViewModel _viewModel;
+
+  @override
+  void initState() {
+    super.initState();
+    _viewModel = context.read<HomeViewModel>();
+    _initialize();
+  }
+
+  Future<void> _initialize() async {
+    await _viewModel.fetch();
+  }
+
   @override
   Widget build(BuildContext context) {
     return ImagePickerWidget();

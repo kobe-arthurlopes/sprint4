@@ -1,11 +1,22 @@
-import 'package:sprint4_app/image_labeling_service.dart';
+import 'package:sprint4_app/common/service/supabase_service_protocol.dart';
+import 'package:sprint4_app/home/data/models/image_label_result.dart';
+import 'package:sprint4_app/home/data/models/label.dart';
+import 'package:sprint4_app/home/data/models/prediction.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-class SupabaseService {
-  static final instance = SupabaseService();
-  final _supabase = Supabase.instance.client;
-  bool _isAuthenticated = false;
+class SupabaseService implements SupabaseServiceProtocol {
+  late final SupabaseClient _supabase;
+  bool isAuthenticated = false;
 
+  SupabaseService() {
+    _initialize();
+  }
+
+  Future<void> _initialize() async {
+    _supabase = Supabase.instance.client;
+  }
+
+  @override
   Future<void> authenticate() async {
     try {
       final response = await _supabase.auth.signInWithPassword(
@@ -14,20 +25,21 @@ class SupabaseService {
       );
 
       if (response.user != null && response.session != null) {
-        _isAuthenticated = true;
+        isAuthenticated = true;
         print("login succeeded — userId: ${response.user!.id}");
         return;
       }
 
-      _isAuthenticated = false;
+      isAuthenticated = false;
       print("login failed — userId: ${response.user?.id}");
     } catch (error) {
       print('error authenticating on Supabase -> $error');
     }
   }
 
+  @override
   Future<List<Label>> getLabels() async {
-    if (!_isAuthenticated) return [];
+    if (!isAuthenticated) return [];
 
     try {
       final data = await _supabase
@@ -41,8 +53,9 @@ class SupabaseService {
     }
   }
 
+  @override
   Future<Label?> getLabel({required int id}) async {
-    if (!_isAuthenticated) return null;
+    if (!isAuthenticated) return null;
 
     try {
       final data = await _supabase
@@ -59,8 +72,9 @@ class SupabaseService {
     }
   }
 
+  @override
   Future<void> createImageLabelResult({String? filePath}) async {
-    if (!_isAuthenticated) return;
+    if (!isAuthenticated) return;
 
     final user = _supabase.auth.currentUser;
 
@@ -82,8 +96,9 @@ class SupabaseService {
     }
   }
 
+  @override
   Future<List<ImageLabelResult>> getImageLabelResults() async {
-    if (!_isAuthenticated) return [];
+    if (!isAuthenticated) return [];
 
     try {
       final data = await _supabase
@@ -104,8 +119,9 @@ class SupabaseService {
     }
   }
 
+  @override
   Future<void> updateImageLabelResult({required String id, String? filePath}) async {
-    if (!_isAuthenticated) return;
+    if (!isAuthenticated) return;
 
     try {
       await _supabase
@@ -119,8 +135,9 @@ class SupabaseService {
     }
   }
 
+  @override
   Future<void> deleteImageLabelResult({required String id}) async {
-    if (!_isAuthenticated) return;
+    if (!isAuthenticated) return;
 
     try {
       await _supabase
@@ -134,12 +151,13 @@ class SupabaseService {
     }
   }
 
+  @override
   Future<void> createPrediction({
     required String resultId, 
     required int labelId, 
     required double confidence
   }) async {
-    if (!_isAuthenticated) return;
+    if (!isAuthenticated) return;
 
     try {
       final data = await _supabase
@@ -161,8 +179,9 @@ class SupabaseService {
     }
   }
 
+  @override
   Future<List<Prediction>> getPredictions({String? resultId}) async {
-    if (!_isAuthenticated) return [];
+    if (!isAuthenticated) return [];
 
     try {
       final List<Map<String, dynamic>> data;
@@ -192,13 +211,14 @@ class SupabaseService {
     }
   }
 
+  @override
   Future<void> updatePrediction({
     required String id,
     String? resultId, 
     int? labelId, 
     double? confidence
   }) async {
-    if (!_isAuthenticated) return;
+    if (!isAuthenticated) return;
 
     if (resultId == null && labelId == null && confidence == null) {
       print('no proprerties passed to update prediction with id $id');
@@ -223,8 +243,9 @@ class SupabaseService {
     }
   }
 
+  @override
   Future<void> deletePrediction({required String id}) async {
-    if (!_isAuthenticated) return;
+    if (!isAuthenticated) return;
 
     try {
       await _supabase
