@@ -137,6 +137,8 @@ do <a href="https://developers.google.com/ml-kit" target="_blank">Google ML Kit<
   await channel.invokeMethod('labelImage', {'bytes': list});
   ```
 
+- Captura de imagens -> Para permitir que o usuário selecione imagens da galeria ou da câmera, foi utilizada a dependência do Flutter ``image_picker``. Esta dependência não exige integração nativa manual, mas funciona em conjunto com o ``MethodChannel`` que envia os bytes da     imagem para o código nativo realizar o processamento via ML Kit.
+
 - Retorno dos resultados para Flutter:
 
   ```swift
