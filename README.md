@@ -20,56 +20,56 @@ do <a href="https://developers.google.com/ml-kit" target="_blank">Google ML Kit<
   <details>
     <summary>Ver código</summary>
 
-      ```swift
-      private func labelImage(withBytes bytes: FlutterStandardTypedData? = nil, result: @escaping FlutterResult) {
-        guard let bytes, let uiImage = UIImage(data: bytes.data) else {
-            result(FlutterError(
-                code: "INVALID_IMAGE",
-                message: "Could not create UIImage from bytes",
-                details: nil
-            ))
-            
-           return
-        }
-        
-        let visionImage = VisionImage(image: uiImage)
-        visionImage.orientation = uiImage.imageOrientation
-        
-        let options = ImageLabelerOptions()
-        options.confidenceThreshold = 0.5
-        
-        let labeler = ImageLabeler.imageLabeler(options: options)
-        
-        labeler.process(visionImage) { labels, error in
-            if let error {
-                result(
-                    FlutterError(
-                        code: "MLKIT_ERROR",
-                        message: error.localizedDescription,
-                        details: nil
-                    )
-                )
-                
-                return
-            }
-            
-            guard let labels else {
-                result([])
-                return
-            }
-            
-            let labelData = labels.map { label in
-                return [
-                    "text": label.text,
-                    "confidence": label.confidence,
-                    "index": label.index
-                ] as [String : Any]
-            }
-            
-            result(labelData)
-        }
+    ```swift  
+    private func labelImage(withBytes bytes: FlutterStandardTypedData? = nil, result: @escaping FlutterResult) {
+      guard let bytes, let uiImage = UIImage(data: bytes.data) else {
+        result(FlutterError(
+          code: "INVALID_IMAGE",
+          message: "Could not create UIImage from bytes",
+          details: nil
+        ))
+          
+        return
       }
-      ```
+        
+      let visionImage = VisionImage(image: uiImage)
+      visionImage.orientation = uiImage.imageOrientation
+      
+      let options = ImageLabelerOptions()
+      options.confidenceThreshold = 0.5
+      
+      let labeler = ImageLabeler.imageLabeler(options: options)
+        
+      labeler.process(visionImage) { labels, error in
+        if let error {
+          result(
+            FlutterError(
+              code: "MLKIT_ERROR",
+              message: error.localizedDescription,
+              details: nil
+            )
+          )
+          
+          return
+        }
+            
+        guard let labels else {
+          result([])
+          return
+        }
+            
+        let labelData = labels.map { label in
+          return [
+            "text": label.text,
+            "confidence": label.confidence,
+            "index": label.index
+          ] as [String : Any]
+        }
+            
+        result(labelData)
+      }
+    }
+    ```
     
   </details>
   
@@ -87,44 +87,44 @@ do <a href="https://developers.google.com/ml-kit" target="_blank">Google ML Kit<
   <details>
     <summary>Ver código</summary>
 
-      ```kotlin
-      private fun labelImage(bytes: ByteArray, result: MethodChannel.Result) {
-        try {
-          val inputStream = ByteArrayInputStream(bytes)
-          val bitmap = BitmapFactory.decodeStream(inputStream)
+    ```kotlin
+    private fun labelImage(bytes: ByteArray, result: MethodChannel.Result) {
+      try {
+        val inputStream = ByteArrayInputStream(bytes)
+        val bitmap = BitmapFactory.decodeStream(inputStream)
 
-          if (bitmap == null) {
-            result.error("INVALID_IMAGE", "Could not decode image", null)
-            return
-          }
-
-          val image = InputImage.fromBitmap(bitmap, 0)
-          val labeler = ImageLabeling.getClient(
-            ImageLabelerOptions.Builder()
-              .setConfidenceThreshold(0.5f)
-              .build()
-          )
-
-          labeler.process(image)
-            .addOnSuccessListener { labels ->
-              val labelData = labels.map { label ->
-                mapOf(
-                  "text" to label.text,
-                  "confidence" to label.confidence,
-                  "index" to label.index
-                )
-              }
-
-              result.success(labelData)
-            }
-            .addOnFailureListener { error ->
-              result.error("ML_KIT_ERROR", error.localizedMessage, null)
-            }
-        } catch (exception: Exception) {
-          result.error("EXCEPTION", exception.localizedMessage, null)
+        if (bitmap == null) {
+          result.error("INVALID_IMAGE", "Could not decode image", null)
+          return
         }
+
+        val image = InputImage.fromBitmap(bitmap, 0)
+        val labeler = ImageLabeling.getClient(
+          ImageLabelerOptions.Builder()
+            .setConfidenceThreshold(0.5f)
+            .build()
+        )
+
+        labeler.process(image)
+          .addOnSuccessListener { labels ->
+            val labelData = labels.map { label ->
+              mapOf(
+                "text" to label.text,
+                "confidence" to label.confidence,
+                "index" to label.index
+              )
+            }
+
+            result.success(labelData)
+          }
+          .addOnFailureListener { error ->
+            result.error("ML_KIT_ERROR", error.localizedMessage, null)
+          }
+      } catch (exception: Exception) {
+        result.error("EXCEPTION", exception.localizedMessage, null)
       }
-      ```
+    }
+    ```
   </details>
   
 
