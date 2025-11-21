@@ -1,7 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:sprint4_app/image_labeling_channel.dart';
+import 'package:sprint4_app/home/data/models/image_label_result.dart';
+import 'package:sprint4_app/common/service/image_labeling_service.dart';
 
 class ImagePickerWidget extends StatefulWidget {
   const ImagePickerWidget({super.key});
@@ -11,52 +12,44 @@ class ImagePickerWidget extends StatefulWidget {
 }
 
 class _ImagePickerWidgetState extends State<ImagePickerWidget> {
-  File? _imageFile;
+  ImageLabelResult imageLabelResult = ImageLabelResult();
   final _picker = ImagePicker();
-  List<LabeledImage>? _labeledImages;
   ImageSource _imageSource = ImageSource.gallery;
 
   _pickImage() async {
     final pickedImage = await _picker.pickImage(source: _imageSource);
 
     if (pickedImage != null) {
-      _imageFile = File(pickedImage.path);
-      await _setLabeledImages();
+      final imageFile = File(pickedImage.path);
+
+      imageLabelResult = await ImageLabelingService.getLabeledImage(imageFile);
+
       setState(() {});
     }
   }
 
-  _setLabeledImages() async {
-    if (_imageFile == null) return;
-    _labeledImages = await ImageLabelingChannel.labelImage(_imageFile!.path);
-  }
-
   List<Widget> _getLabeledImagesWidget() {
-    if (_labeledImages == null) return [];
+    if (imageLabelResult.predictions.isEmpty) return [];
 
     List<Widget> all = [];
 
-    for (var labeledImage in _labeledImages!) {
-      all.add(Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            labeledImage.text,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold
+    for (var prediction in imageLabelResult.predictions) {
+      all.add(
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              prediction.label.text,
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
-          ),
 
-          Text(
-            labeledImage.confidence,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.normal
+            Text(
+              prediction.confidenceText,
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.normal),
             ),
-          )
-        ],
-      ));
+          ],
+        ),
+      );
 
       all.add(SizedBox(height: 10));
     }
@@ -70,35 +63,32 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
       appBar: AppBar(title: const Text('Image picker')),
       body: Padding(
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-        child: _imageFile == null
+        child: imageLabelResult.file == null
             ? Center(
-              child: const Text(
-                'No image selected',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold
+                child: const Text(
+                  'No image selected',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+              )
+            : SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Image.file(
+                        imageLabelResult.file!,
+                        width: 200,
+                        height: 200,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+
+                    SizedBox(height: 20),
+
+                    ..._getLabeledImagesWidget(),
+                  ],
                 ),
               ),
-            )
-            : SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Center(
-                    child: Image.file(
-                      _imageFile!,
-                      width: 200,
-                      height: 200,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-
-                  SizedBox(height: 20),
-
-                  ..._getLabeledImagesWidget()
-                ],
-              ),
-            )
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: Padding(
@@ -113,14 +103,14 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
               },
               child: Icon(Icons.camera_alt),
             ),
-        
+
             FloatingActionButton(
               onPressed: () {
                 setState(() => _imageSource = ImageSource.gallery);
                 _pickImage();
               },
               child: Icon(Icons.photo),
-            )
+            ),
           ],
         ),
       ),
