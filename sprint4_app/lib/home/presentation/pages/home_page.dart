@@ -4,24 +4,23 @@ import 'package:sprint4_app/home/presentation/components/image_picker_widget.dar
 import 'package:sprint4_app/home/presentation/view_models/home_view_model.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  const HomePage({super.key, required this.viewModel});
+  final HomeViewModel viewModel;
 
   @override
   State<HomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<HomePage> {
-  late final HomeViewModel _viewModel;
 
   @override
   void initState() {
     super.initState();
-    _viewModel = context.read<HomeViewModel>();
     _initialize();
   }
 
   Future<void> _initialize() async {
-    await _viewModel.fetch();
+    await widget.viewModel.fetch();
   }
 
   @override

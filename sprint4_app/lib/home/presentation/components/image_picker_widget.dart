@@ -59,59 +59,56 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Image picker')),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-        child: imageLabelResult.file == null
-            ? Center(
-                child: const Text(
-                  'No image selected',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-              )
-            : SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Center(
-                      child: Image.file(
-                        imageLabelResult.file!,
-                        width: 200,
-                        height: 200,
-                        fit: BoxFit.cover,
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(title: const Text('Image picker')),
+        body: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+          child: imageLabelResult.file == null
+              ? Center(
+                  child: SizedBox(width: 250, child: Image.asset('images/pic-button.png'))
+                )
+              : SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Center(
+                        child: Image.file(
+                          imageLabelResult.file!,
+                          width: 200,
+                          height: 200,
+                          fit: BoxFit.cover,
+                        ),
                       ),
-                    ),
-
-                    SizedBox(height: 20),
-
-                    ..._getLabeledImagesWidget(),
-                  ],
+      
+                      SizedBox(height: 20),
+      
+                      ..._getLabeledImagesWidget(),
+                    ],
+                  ),
                 ),
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+        floatingActionButton: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              FloatingActionButton(
+                onPressed:
+                  _pickImage,
+                child: Icon(Icons.camera_alt),
               ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            FloatingActionButton(
-              onPressed: () {
-                setState(() => _imageSource = ImageSource.camera);
-                _pickImage();
-              },
-              child: Icon(Icons.camera_alt),
-            ),
-
-            FloatingActionButton(
-              onPressed: () {
-                setState(() => _imageSource = ImageSource.gallery);
-                _pickImage();
-              },
-              child: Icon(Icons.photo),
-            ),
-          ],
+      
+              FloatingActionButton(
+                onPressed: () {
+                  setState(() => _imageSource = ImageSource.gallery);
+                  _pickImage();
+                },
+                child: Icon(Icons.photo),
+              ),
+            ],
+          ),
         ),
       ),
     );
