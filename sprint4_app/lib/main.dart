@@ -11,13 +11,16 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Supabase.initialize(
-    url: 'https://xrelnsmrfjvyiamzpsbp.supabase.co', 
-    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhyZWxuc21yZmp2eWlhbXpwc2JwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM0MjI1MTQsImV4cCI6MjA3ODk5ODUxNH0.TOXF9JREDosuSi-Dn34ptk0RWe-y9lNcfZ_8dONW95s'
+    url: 'https://xrelnsmrfjvyiamzpsbp.supabase.co',
+    anonKey:
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhyZWxuc21yZmp2eWlhbXpwc2JwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM0MjI1MTQsImV4cCI6MjA3ODk5ODUxNH0.TOXF9JREDosuSi-Dn34ptk0RWe-y9lNcfZ_8dONW95s',
   );
 
   final supabaseService = SupabaseService();
-  await supabaseService.authenticate();
-  final homeRemoteDataSource = HomeRemoteDataSource(supabaseService: supabaseService);
+  // await supabaseService.authenticate();
+  final homeRemoteDataSource = HomeRemoteDataSource(
+    supabaseService: supabaseService,
+  );
   final homeRepository = HomeRepository(remote: homeRemoteDataSource);
 
   runApp(
@@ -25,10 +28,10 @@ Future<void> main() async {
       providers: [
         Provider<HomeViewModel>(
           create: (_) => HomeViewModel(repository: homeRepository),
-        )
+        ),
       ],
       child: const MyApp(),
-    )
+    ),
   );
 }
 

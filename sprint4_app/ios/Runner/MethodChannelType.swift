@@ -3,14 +3,11 @@ import Flutter
 
 enum MethodChannelType {
     case imageLabeling
-    case platformIdentifier
     
     var propertyName: String {
         switch self {
             case .imageLabeling:
                 "image_labeling"
-            case .platformIdentifier:
-                "platform_identifier"
         }
     }
     
@@ -18,8 +15,6 @@ enum MethodChannelType {
         switch self {
             case .imageLabeling:
                 "labelImage"
-            case .platformIdentifier:
-                "identifyPlatform"
         }
     }
     
@@ -60,8 +55,6 @@ enum MethodChannelType {
                 }
             
                 ImageLabelingService.labelImage(withBytes: bytes, result: result)
-            case .platformIdentifier:
-                result("iOS")
         }
     }
 }

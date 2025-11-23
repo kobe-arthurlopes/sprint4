@@ -13,8 +13,5 @@ class MainActivity : FlutterActivity() {
 
         methodChannelType = MethodChannelType.IMAGE_LABELING
         methodChannelType?.setMethodCallHandler(binaryMessenger)
-
-        methodChannelType = MethodChannelType.PLATFORM_IDENTIFIER
-        methodChannelType?.setMethodCallHandler(binaryMessenger)
     }
 }

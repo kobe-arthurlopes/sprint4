@@ -6,6 +6,6 @@ class HomeViewModel {
   HomeViewModel({required this.repository});
 
   Future<void> fetch() async {
-    final results = await repository.fetchData();
+    // final results = await repository.fetchData();
   }
 }

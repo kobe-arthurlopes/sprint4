@@ -17,9 +17,6 @@ import UIKit
             
             self.methodChannelType = .imageLabeling
             self.methodChannelType?.setMethodCallHandler(binaryMessenger: binaryMessenger)
-            
-            self.methodChannelType = .platformIdentifier
-            self.methodChannelType?.setMethodCallHandler(binaryMessenger: binaryMessenger)
         }
 
         GeneratedPluginRegistrant.register(with: self)

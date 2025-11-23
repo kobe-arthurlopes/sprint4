@@ -8,8 +8,7 @@ enum class MethodChannelType(
     val propertyName: String,
     val methodName: String
 ) {
-    IMAGE_LABELING("image_labeling", "labelImage"),
-    PLATFORM_IDENTIFIER("platform_identifier", "identifyPlatform");
+    IMAGE_LABELING("image_labeling", "labelImage");
 
     private fun channel(binaryMessenger: BinaryMessenger): MethodChannel {
         val channelName = "com.sprint4/$propertyName"
@@ -41,10 +40,6 @@ enum class MethodChannelType(
                 }
 
                 ImageLabelingService.labelImage(bytes, result)
-            }
-
-            PLATFORM_IDENTIFIER -> {
-                result.success("Android")
             }
         }
     }

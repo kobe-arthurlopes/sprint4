@@ -13,8 +13,8 @@ class SupabaseService implements SupabaseServiceProtocol {
   late final SupabaseClient _supabase;
   bool isAuthenticated = false;
   SignInMethod signInMethod = SignInMethod.unknown;
-  String? _email;
-  String? _password;
+  // String? _email;
+  // String? _password;
 
   SupabaseService() {
     _initialize();
