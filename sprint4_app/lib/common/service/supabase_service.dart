@@ -1,8 +1,4 @@
-import 'dart:convert';
-
-import 'package:crypto/crypto.dart';
-import 'package:sign_in_with_apple/sign_in_with_apple.dart';
-import 'package:sprint4_app/common/service/sign_in_method.dart';
+import 'package:sprint4_app/common/service/sign_in/sign_in_method.dart';
 import 'package:sprint4_app/common/service/supabase_service_protocol.dart';
 import 'package:sprint4_app/home/data/models/image_label_result.dart';
 import 'package:sprint4_app/home/data/models/label.dart';
@@ -13,6 +9,7 @@ class SupabaseService implements SupabaseServiceProtocol {
   late final SupabaseClient _supabase;
   bool isAuthenticated = false;
   SignInMethod signInMethod = SignInMethod.unknown;
+
   // String? _email;
   // String? _password;
 
@@ -48,29 +45,10 @@ class SupabaseService implements SupabaseServiceProtocol {
   }
 
   Future<AuthResponse> _getAuthResponse() async {
-    switch (signInMethod) {
-      case SignInMethod.apple:
-        return _signInWithApple();
-      case SignInMethod.google:
-        return _signInWithApple();
-      case SignInMethod.unknown:
-        return _signInWithApple();
-    }
-  }
-
-  Future<AuthResponse> _signInWithApple() async {
+    final signInService = signInMethod.signInService();
     final rawNonce = _supabase.auth.generateRawNonce();
-    final hashedNonce = sha256.convert(utf8.encode(rawNonce)).toString();
 
-    final credential = await SignInWithApple.getAppleIDCredential(
-      scopes: [
-        AppleIDAuthorizationScopes.email,
-        AppleIDAuthorizationScopes.fullName,
-      ],
-      nonce: hashedNonce,
-    );
-
-    final idToken = credential.identityToken;
+    final idToken = await signInService.getIdToken(rawNonce: rawNonce);
 
     if (idToken == null) {
       throw const AuthException(
