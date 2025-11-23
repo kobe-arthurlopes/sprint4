@@ -13,7 +13,9 @@ class ImageLabelingService {
     final bytes = await file.readAsBytes();
     final list = bytes.buffer.asUint8List();
     final arguments = {'bytes': list};
-    final result = await MethodChannelType.imageLabeling.getResult(arguments);
+    final result = await MethodChannelType.imageLabeling.getResult(
+      arguments: arguments,
+    );
 
     final predictions = (result as List)
         .map(

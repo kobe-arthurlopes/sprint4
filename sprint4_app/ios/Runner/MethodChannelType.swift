@@ -60,8 +60,8 @@ enum MethodChannelType {
                 }
             
                 ImageLabelingService.labelImage(withBytes: bytes, result: result)
-            default:
-                return
+            case .platformIdentifier:
+                result("iOS")
         }
     }
 }

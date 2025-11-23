@@ -26,7 +26,7 @@ enum MethodChannelType {
 
   MethodChannel get channel => MethodChannel('$baseName/$propertyName');
 
-  Future<dynamic> getResult(Map<String, dynamic>? arguments) async {
+  Future<dynamic> getResult({Map<String, dynamic>? arguments}) async {
     return await channel.invokeMethod(methodName, arguments);
   }
 }

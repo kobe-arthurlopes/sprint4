@@ -9,7 +9,12 @@ class MainActivity : FlutterActivity() {
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
 
+        val binaryMessenger = flutterEngine.dartExecutor.binaryMessenger
+
         methodChannelType = MethodChannelType.IMAGE_LABELING
-        methodChannelType?.setMethodCallHandler(flutterEngine.dartExecutor.binaryMessenger)
+        methodChannelType?.setMethodCallHandler(binaryMessenger)
+
+        methodChannelType = MethodChannelType.PLATFORM_IDENTIFIER
+        methodChannelType?.setMethodCallHandler(binaryMessenger)
     }
 }

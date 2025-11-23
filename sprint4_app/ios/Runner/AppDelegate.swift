@@ -13,8 +13,13 @@ import UIKit
         let controller = windowScene?.windows.first?.rootViewController as? FlutterViewController
       
         if let controller {
+            let binaryMessenger = controller.binaryMessenger
+            
             self.methodChannelType = .imageLabeling
-            self.methodChannelType?.setMethodCallHandler(binaryMessenger: controller.binaryMessenger)
+            self.methodChannelType?.setMethodCallHandler(binaryMessenger: binaryMessenger)
+            
+            self.methodChannelType = .platformIdentifier
+            self.methodChannelType?.setMethodCallHandler(binaryMessenger: binaryMessenger)
         }
 
         GeneratedPluginRegistrant.register(with: self)
