@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sprint4_app/home/data/models/image_label_result.dart';
 import 'package:sprint4_app/common/service/image_labeling_service.dart';
+import 'package:sprint4_app/home/presentation/components/pulsing_button.dart';
 
 class ImagePickerWidget extends StatefulWidget {
   const ImagePickerWidget({super.key});
@@ -65,9 +66,7 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
         body: Padding(
           padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
           child: imageLabelResult.file == null
-              ? Center(
-                  child: SizedBox(width: 250, child: Image.asset('images/pic-button.png'))
-                )
+              ? PulsingButton()
               : SingleChildScrollView(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
