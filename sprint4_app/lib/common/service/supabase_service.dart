@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:crypto/crypto.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
+import 'package:sprint4_app/common/service/sign_in_method.dart';
 import 'package:sprint4_app/common/service/supabase_service_protocol.dart';
 import 'package:sprint4_app/home/data/models/image_label_result.dart';
 import 'package:sprint4_app/home/data/models/label.dart';
@@ -11,6 +12,9 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class SupabaseService implements SupabaseServiceProtocol {
   late final SupabaseClient _supabase;
   bool isAuthenticated = false;
+  SignInMethod signInMethod = SignInMethod.unknown;
+  String? _email;
+  String? _password;
 
   SupabaseService() {
     _initialize();
@@ -23,10 +27,12 @@ class SupabaseService implements SupabaseServiceProtocol {
   @override
   Future<void> authenticate() async {
     try {
-      final response = await _supabase.auth.signInWithPassword(
-        email: 'mocked.email@gmail.com',
-        password: '1234',
-      );
+      final response = await _getAuthResponse();
+
+      // final response = await _supabase.auth.signInWithPassword(
+      //   email: 'mocked.email@gmail.com',
+      //   password: '1234',
+      // );
 
       if (response.user != null && response.session != null) {
         isAuthenticated = true;
@@ -41,8 +47,18 @@ class SupabaseService implements SupabaseServiceProtocol {
     }
   }
 
-  @override
-  Future<AuthResponse> signInWithApple() async {
+  Future<AuthResponse> _getAuthResponse() async {
+    switch (signInMethod) {
+      case SignInMethod.apple:
+        return _signInWithApple();
+      case SignInMethod.google:
+        return _signInWithApple();
+      case SignInMethod.unknown:
+        return _signInWithApple();
+    }
+  }
+
+  Future<AuthResponse> _signInWithApple() async {
     final rawNonce = _supabase.auth.generateRawNonce();
     final hashedNonce = sha256.convert(utf8.encode(rawNonce)).toString();
 
@@ -65,7 +81,7 @@ class SupabaseService implements SupabaseServiceProtocol {
     return _supabase.auth.signInWithIdToken(
       provider: OAuthProvider.apple,
       idToken: idToken,
-      nonce: rawNonce
+      nonce: rawNonce,
     );
   }
 
