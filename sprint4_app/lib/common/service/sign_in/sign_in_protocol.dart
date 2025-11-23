@@ -1,3 +1,3 @@
 abstract class SignInProtocol {
-  Future<String?> getIdToken({required String rawNonce});
+  Future<String?> getIdToken({String? rawNonce});
 }

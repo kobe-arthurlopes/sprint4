@@ -6,7 +6,9 @@ import 'package:sprint4_app/common/service/sign_in/sign_in_protocol.dart';
 
 class AppleSignInService implements SignInProtocol {
   @override
-  Future<String?> getIdToken({required rawNonce}) async {
+  Future<String?> getIdToken({String? rawNonce}) async {
+    if (rawNonce == null) return null;
+
     final hashedNonce = sha256.convert(utf8.encode(rawNonce)).toString();
 
     final credential = await SignInWithApple.getAppleIDCredential(
