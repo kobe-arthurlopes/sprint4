@@ -8,7 +8,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class SupabaseService implements SupabaseServiceProtocol {
   late final SupabaseClient _supabase;
   bool isAuthenticated = false;
-  SignInMethod signInMethod = SignInMethod.unknown;
+  SignInMethod signInMethod = SignInMethod.google;
 
   // String? _email;
   // String? _password;
@@ -46,6 +46,7 @@ class SupabaseService implements SupabaseServiceProtocol {
 
   Future<AuthResponse> _getAuthResponse() async {
     final signInService = signInMethod.signInService();
+    final oAuthProvider = signInMethod.oAuthProvider();
     final rawNonce = _supabase.auth.generateRawNonce();
 
     final idToken = await signInService.getIdToken(rawNonce: rawNonce);
@@ -57,7 +58,7 @@ class SupabaseService implements SupabaseServiceProtocol {
     }
 
     return _supabase.auth.signInWithIdToken(
-      provider: OAuthProvider.apple,
+      provider: oAuthProvider,
       idToken: idToken,
       nonce: rawNonce,
     );
