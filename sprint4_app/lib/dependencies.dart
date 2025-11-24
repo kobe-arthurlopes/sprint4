@@ -17,9 +17,10 @@ Future<void> injectDependencies() async {
   );
 
   final supabaseService = SupabaseService();
-  await supabaseService.authenticate();
+  // await supabaseService.authenticate();
   final remoteDataSource = RemoteDataSource(supabaseService: supabaseService);
   final homeRepository = HomeRepository(remote: remoteDataSource);
+
   runApp(
     MultiProvider(
       providers: [

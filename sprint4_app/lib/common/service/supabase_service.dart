@@ -1,3 +1,4 @@
+import 'package:sprint4_app/common/service/sign_in/sign_in_method.dart';
 import 'package:sprint4_app/common/service/supabase_service_protocol.dart';
 import 'package:sprint4_app/data/models/image_label_result.dart';
 import 'package:sprint4_app/data/models/label.dart';
@@ -7,6 +8,10 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class SupabaseService implements SupabaseServiceProtocol {
   late final SupabaseClient _supabase;
   bool isAuthenticated = false;
+  SignInMethod signInMethod = SignInMethod.google;
+
+  // String? _email;
+  // String? _password;
 
   SupabaseService() {
     _initialize();
@@ -19,10 +24,12 @@ class SupabaseService implements SupabaseServiceProtocol {
   @override
   Future<void> authenticate() async {
     try {
-      final response = await _supabase.auth.signInWithPassword(
-        email: 'mocked.email@gmail.com',
-        password: '1234'
-      );
+      final response = await _getAuthResponse();
+
+      // final response = await _supabase.auth.signInWithPassword(
+      //   email: 'mocked.email@gmail.com',
+      //   password: '1234',
+      // );
 
       if (response.user != null && response.session != null) {
         isAuthenticated = true;
@@ -37,14 +44,32 @@ class SupabaseService implements SupabaseServiceProtocol {
     }
   }
 
+  Future<AuthResponse> _getAuthResponse() async {
+    final signInService = signInMethod.signInService();
+    final oAuthProvider = signInMethod.oAuthProvider();
+    final rawNonce = _supabase.auth.generateRawNonce();
+
+    final idToken = await signInService.getIdToken(rawNonce: rawNonce);
+
+    if (idToken == null) {
+      throw const AuthException(
+        'Could not find ID Token from generated credential.',
+      );
+    }
+
+    return _supabase.auth.signInWithIdToken(
+      provider: oAuthProvider,
+      idToken: idToken,
+      nonce: rawNonce,
+    );
+  }
+
   @override
   Future<List<Label>> getLabels() async {
     if (!isAuthenticated) return [];
 
     try {
-      final data = await _supabase
-        .from('labels')
-        .select();
+      final data = await _supabase.from('labels').select();
 
       return data.map((element) => Label.fromMap(element)).toList();
     } catch (error) {
@@ -59,10 +84,10 @@ class SupabaseService implements SupabaseServiceProtocol {
 
     try {
       final data = await _supabase
-        .from('labels')
-        .select()
-        .eq('id', id)
-        .limit(1);
+          .from('labels')
+          .select()
+          .eq('id', id)
+          .limit(1);
 
       final item = data.first;
       return Label.fromMap(item);
@@ -82,10 +107,10 @@ class SupabaseService implements SupabaseServiceProtocol {
 
     try {
       final data = await _supabase
-        .from('image_label_results')
-        .insert({'user_id': user.id, 'file_path': filePath})
-        .select()
-        .limit(1);
+          .from('image_label_results')
+          .insert({'user_id': user.id, 'file_path': filePath})
+          .select()
+          .limit(1);
 
       final item = data.first;
       final result = ImageLabelResult.fromMap(item);
@@ -101,9 +126,7 @@ class SupabaseService implements SupabaseServiceProtocol {
     if (!isAuthenticated) return [];
 
     try {
-      final data = await _supabase
-        .from('image_label_results')
-        .select();
+      final data = await _supabase.from('image_label_results').select();
 
       final imageLabelResultFutures = data.map((element) async {
         var result = ImageLabelResult.fromMap(element);
@@ -120,14 +143,17 @@ class SupabaseService implements SupabaseServiceProtocol {
   }
 
   @override
-  Future<void> updateImageLabelResult({required String id, String? filePath}) async {
+  Future<void> updateImageLabelResult({
+    required String id,
+    String? filePath,
+  }) async {
     if (!isAuthenticated) return;
 
     try {
       await _supabase
-        .from('image_label_results')
-        .update({'file_path': filePath})
-        .eq('id', id);
+          .from('image_label_results')
+          .update({'file_path': filePath})
+          .eq('id', id);
 
       print('updated image label result with id $id');
     } catch (error) {
@@ -140,10 +166,7 @@ class SupabaseService implements SupabaseServiceProtocol {
     if (!isAuthenticated) return;
 
     try {
-      await _supabase
-        .from('image_label_results')
-        .delete()
-        .eq('id', id);
+      await _supabase.from('image_label_results').delete().eq('id', id);
 
       print('deleted image label result with id $id');
     } catch (error) {
@@ -153,22 +176,22 @@ class SupabaseService implements SupabaseServiceProtocol {
 
   @override
   Future<void> createPrediction({
-    required String resultId, 
-    required int labelId, 
-    required double confidence
+    required String resultId,
+    required int labelId,
+    required double confidence,
   }) async {
     if (!isAuthenticated) return;
 
     try {
       final data = await _supabase
-        .from('predictions')
-        .insert({
-          'result_id': resultId,
-          'label_id': labelId,
-          'confidence': confidence
-        })
-        .select()
-        .limit(1);
+          .from('predictions')
+          .insert({
+            'result_id': resultId,
+            'label_id': labelId,
+            'confidence': confidence,
+          })
+          .select()
+          .limit(1);
 
       final item = data.first;
       final prediction = Prediction.fromDBMap(item);
@@ -188,13 +211,11 @@ class SupabaseService implements SupabaseServiceProtocol {
 
       if (resultId != null) {
         data = await _supabase
-          .from('predictions')
-          .select()
-          .eq('result_id', resultId);
+            .from('predictions')
+            .select()
+            .eq('result_id', resultId);
       } else {
-        data = await _supabase
-          .from('predictions')
-          .select();
+        data = await _supabase.from('predictions').select();
       }
 
       final predictionFutures = data.map((element) async {
@@ -214,9 +235,9 @@ class SupabaseService implements SupabaseServiceProtocol {
   @override
   Future<void> updatePrediction({
     required String id,
-    String? resultId, 
-    int? labelId, 
-    double? confidence
+    String? resultId,
+    int? labelId,
+    double? confidence,
   }) async {
     if (!isAuthenticated) return;
 
@@ -232,10 +253,7 @@ class SupabaseService implements SupabaseServiceProtocol {
     if (confidence != null) insertionMap['confidence'] = confidence;
 
     try {
-      await _supabase
-        .from('predictions')
-        .update(insertionMap)
-        .eq('id', id);
+      await _supabase.from('predictions').update(insertionMap).eq('id', id);
 
       print('updated prediction with id $id');
     } catch (error) {
@@ -248,10 +266,7 @@ class SupabaseService implements SupabaseServiceProtocol {
     if (!isAuthenticated) return;
 
     try {
-      await _supabase
-        .from('predictions')
-        .delete()
-        .eq('id', id);
+      await _supabase.from('predictions').delete().eq('id', id);
 
       print('deleted prediction with id $id');
     } catch (error) {
