@@ -8,7 +8,7 @@ class HomeViewModel extends ChangeNotifier {
   bool showBottomSheet = true;
 
   Future<void> fetch() async {
-    final results = await repository.fetchData();
+    // final results = await repository.fetchData();
   }
 
   void hideBottomSheet() {
