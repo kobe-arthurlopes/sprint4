@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sprint4_app/presentation/components/draggable_bottom_sheet.dart';
 import 'package:sprint4_app/presentation/components/image_picker_widget.dart';
-import 'package:sprint4_app/presentation/home/home_view_model.dart';
+import 'package:sprint4_app/presentation/view_models/home_view_model.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key, required this.viewModel});

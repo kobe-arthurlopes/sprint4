@@ -1,10 +1,10 @@
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:sprint4_app/data/repositories/home_repository.dart';
-import 'package:sprint4_app/presentation/home/home_page.dart';
-import 'package:sprint4_app/presentation/content/list_page.dart';
-import 'package:sprint4_app/presentation/home/home_view_model.dart';
-import 'package:sprint4_app/presentation/content/list_view_model.dart';
+import 'package:sprint4_app/presentation/pages/home_page.dart';
+import 'package:sprint4_app/presentation/pages/list_page.dart';
+import 'package:sprint4_app/presentation/view_models/home_view_model.dart';
+import 'package:sprint4_app/presentation/view_models/list_view_model.dart';
 
 // Configuração do GoRouter
 GoRouter router(HomeRepository homeRepo) {

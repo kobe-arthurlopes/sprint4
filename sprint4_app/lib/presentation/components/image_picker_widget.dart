@@ -5,7 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:sprint4_app/data/models/image_label_result.dart';
 import 'package:sprint4_app/common/service/image_labeling_service.dart';
 import 'package:sprint4_app/presentation/components/pulsing_button.dart';
-import 'package:sprint4_app/presentation/home/home_view_model.dart';
+import 'package:sprint4_app/presentation/view_models/home_view_model.dart';
 
 class ImagePickerWidget extends StatefulWidget {
   final HomeViewModel viewModel;

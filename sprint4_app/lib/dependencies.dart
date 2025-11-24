@@ -4,9 +4,9 @@ import 'package:sprint4_app/common/service/supabase_service.dart';
 import 'package:sprint4_app/data/data_sources/home_remote_data_source.dart';
 import 'package:sprint4_app/data/repositories/home_repository.dart';
 import 'package:sprint4_app/data/repositories/list_repository.dart';
-import 'package:sprint4_app/presentation/home/home_view_model.dart';
-import 'package:sprint4_app/presentation/content/list_view_model.dart';
+import 'package:sprint4_app/presentation/view_models/home_view_model.dart';
 import 'package:sprint4_app/main.dart';
+import 'package:sprint4_app/presentation/view_models/list_view_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 Future<void> injectDependencies() async {

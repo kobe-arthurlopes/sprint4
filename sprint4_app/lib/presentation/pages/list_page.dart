@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sprint4_app/data/models/image_label_result.dart';
 import 'package:sprint4_app/presentation/components/image_labels_list.dart';
-import 'package:sprint4_app/presentation/content/list_view_model.dart';
+import 'package:sprint4_app/presentation/view_models/list_view_model.dart';
 
 class ListPage extends StatefulWidget {
   final ListViewModel viewModel;

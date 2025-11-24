@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:sprint4_app/presentation/content/list_page.dart';
+import 'package:sprint4_app/presentation/pages/list_page.dart';
 
 class DraggableBottomSheet extends StatefulWidget {
   @override
