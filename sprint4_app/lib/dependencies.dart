@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sprint4_app/common/service/supabase_service.dart';
-import 'package:sprint4_app/home/data/data_sources/home_remote_data_source.dart';
-import 'package:sprint4_app/home/data/repositories/home_repository.dart';
-import 'package:sprint4_app/home/presentation/view_models/home_view_model.dart';
+import 'package:sprint4_app/data/data_sources/home_remote_data_source.dart';
+import 'package:sprint4_app/data/repositories/home_repository.dart';
+import 'package:sprint4_app/data/repositories/list_repository.dart';
+import 'package:sprint4_app/presentation/home/home_view_model.dart';
+import 'package:sprint4_app/presentation/content/list_view_model.dart';
 import 'package:sprint4_app/main.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -16,18 +18,23 @@ Future<void> injectDependencies() async {
 
   final supabaseService = SupabaseService();
   await supabaseService.authenticate();
-  final homeRemoteDataSource = HomeRemoteDataSource(supabaseService: supabaseService);
-  final homeRepository = HomeRepository(remote: homeRemoteDataSource);
+  final remoteDataSource = RemoteDataSource(supabaseService: supabaseService);
+  final homeRepository = HomeRepository(remote: remoteDataSource);
   runApp(
     MultiProvider(
       providers: [
-        Provider<HomeRemoteDataSource>(create: (context) => HomeRemoteDataSource(supabaseService: supabaseService)),
+        Provider<RemoteDataSource>(create: (context) => RemoteDataSource(supabaseService: supabaseService)),
+        Provider<HomeRepository>(create: (context) => HomeRepository(remote: context.read())),
+        ListenableProvider<ListRepository>(create: (context) => ListRepository(remote: context.read())),
         ChangeNotifierProvider<HomeRepository>(
           create: (context) => HomeRepository(remote: context.read()),
         ),
-        Provider<HomeViewModel>(
-                  create: (_) => HomeViewModel(repository: homeRepository),
-                )
+        ChangeNotifierProvider<HomeViewModel>(
+          create: (context) => HomeViewModel(repository: context.read()),
+                ),
+        ChangeNotifierProvider<ListViewModel>(
+          create: (context) => ListViewModel(repository: context.read())
+        )
               ],
     child: const MyApp(),
     )

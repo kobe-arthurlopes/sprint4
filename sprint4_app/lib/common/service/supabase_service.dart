@@ -1,7 +1,7 @@
 import 'package:sprint4_app/common/service/supabase_service_protocol.dart';
-import 'package:sprint4_app/home/data/models/image_label_result.dart';
-import 'package:sprint4_app/home/data/models/label.dart';
-import 'package:sprint4_app/home/data/models/prediction.dart';
+import 'package:sprint4_app/data/models/image_label_result.dart';
+import 'package:sprint4_app/data/models/label.dart';
+import 'package:sprint4_app/data/models/prediction.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SupabaseService implements SupabaseServiceProtocol {
