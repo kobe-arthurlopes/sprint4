@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 
 class PulsingButton extends StatefulWidget {
+  final VoidCallback? onTap;
+
+  const PulsingButton({super.key, this.onTap});
+
   @override
   State<PulsingButton> createState() => _PulsingButtonState();
 }
@@ -30,12 +34,15 @@ class _PulsingButtonState extends State<PulsingButton> with SingleTickerProvider
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: ScaleTransition(
-        scale: _animation,
-        child: SizedBox(
-          width: 250,
-          child: Image.asset('images/pic-button.png'),
+    return GestureDetector(
+      onTap: widget.onTap,
+      child: Center(
+        child: ScaleTransition(
+          scale: _animation,
+          child: SizedBox(
+            width: 250,
+            child: Image.asset('images/pic-button.png'),
+          ),
         ),
       ),
     );

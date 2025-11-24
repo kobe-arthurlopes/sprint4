@@ -1,47 +1,95 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:sprint4_app/presentation/pages/list_page.dart';
 
 class DraggableBottomSheet extends StatefulWidget {
+  final Widget expandedContent;
+
+  const DraggableBottomSheet({
+    super.key, 
+    required this.expandedContent,
+  });
+
   @override
   State<DraggableBottomSheet> createState() => _DraggableBottomSheetState();
 }
 
 class _DraggableBottomSheetState extends State<DraggableBottomSheet>
     with SingleTickerProviderStateMixin {
-  final double minHeight = 120;
-  final double maxHeight = 800;
+  final double _minHeight = 120;
+  final double _maxHeight = 800;
+  double _currentHeight = 120;
+  bool _isExpanded = false;
+  bool _isDragging = false;
   
   late AnimationController _controller;
-  
-  double currentHeight = 120;
-  bool isExpanded = false;
-  bool isDragging = false;
 
   @override
   void initState() {
     super.initState();
+
     _controller = AnimationController(
       duration: const Duration(milliseconds: 600),
       vsync: this,
     );
   }
 
-    @override
+  @override
   void dispose() {
     _controller.dispose();
     super.dispose();
   }
 
-    void _toggleSheet() {
-    if (isExpanded) {
+  void _toggleSheet() {
+    if (_isExpanded) {
       _controller.reverse();
     } else {
       _controller.forward();
     }
+
     setState(() {
-      isExpanded = !isExpanded;
+      _isExpanded = !_isExpanded;
     });
+  }
+
+  void _handleDragStart() {
+    setState(() => _isDragging = true);
+  }
+
+  void _handleDragUpdate(DragUpdateDetails details) {
+    setState(() {
+      _currentHeight -= details.delta.dy;
+      _currentHeight = _currentHeight.clamp(_minHeight, _maxHeight);
+    });
+  }
+
+  void _handleDragEnd(DragEndDetails details) {
+    setState(() => _isDragging = false);
+
+    final threshold = 5.0; 
+    final primaryVelocity = details.primaryVelocity;
+
+    if (primaryVelocity == null) return;
+
+    if (primaryVelocity < -threshold) {
+      _currentHeight = _maxHeight;
+      _controller.forward();
+      setState(() {
+        _isExpanded = true;
+      });
+    } else if (primaryVelocity > threshold) {
+      _currentHeight = _minHeight;
+      _controller.reverse();
+      setState(() {
+        _isExpanded = false;
+      });
+    } else {
+      if (_isExpanded) {
+        _currentHeight = _maxHeight;
+        _controller.forward();
+      } else {
+        _currentHeight = _minHeight;
+        _controller.reverse();
+      }
+    }
   }
 
   @override
@@ -51,77 +99,46 @@ class _DraggableBottomSheetState extends State<DraggableBottomSheet>
       right: 0,
       bottom: 0,
       child: GestureDetector(
-        onVerticalDragStart: (details) {
-          isDragging = true;
-        },
-        onVerticalDragUpdate: (details) {
-          setState(() {
-            currentHeight -= details.delta.dy;
-            currentHeight = currentHeight.clamp(minHeight, maxHeight);
-          });
-        },
-        onVerticalDragEnd: (details) {
-          isDragging = false;
-          final threshold = 5.0; 
-          if (details.primaryVelocity! < -threshold) {
-            currentHeight = maxHeight;
-            _controller.forward();
-            setState(() {
-              isExpanded = true;
-            });
-          } else if (details.primaryVelocity! > threshold) {
-            currentHeight = minHeight;
-            _controller.reverse();
-            setState(() {
-              isExpanded = false;
-            });
-          } else {
-            if (isExpanded) {
-              currentHeight = maxHeight;
-              _controller.forward();
-            } else {
-             currentHeight = minHeight;
-              _controller.reverse();
-            }
-          }
-        },
+        onVerticalDragStart: (_) => _handleDragStart(),
+        onVerticalDragUpdate: _handleDragUpdate,
+        onVerticalDragEnd: _handleDragEnd,
         child: Container(
-          height: currentHeight,
+          height: _currentHeight,
           decoration: BoxDecoration(
             color: Color(0xFF1E1E1E),
             borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.5),
+                color: Colors.black.withValues(alpha: 0.5),
                 blurRadius: 20,
                 offset: Offset(0, -5),
               ),
             ],
           ),
           child:
-               Column(
-                children: [
-                  // Handle (barra de arrasto)
-                  GestureDetector(
-                    onTap: _toggleSheet,
-                    child: Container(
-                      width: double.infinity,
-                      padding: EdgeInsets.symmetric(vertical: 16),
-                      child: Center(
-                        child: Container(
-                          width: 40,
-                          height: 5,
-                          decoration: BoxDecoration(
-                            color: Colors.grey[600],
-                            borderRadius: BorderRadius.circular(10),
-                          ),
+            Column(
+              children: [
+                // Handle (barra de arrasto)
+                GestureDetector(
+                  onTap: _toggleSheet,
+                  child: Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.symmetric(vertical: 16),
+                    child: Center(
+                      child: Container(
+                        width: 40,
+                        height: 5,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[600],
+                          borderRadius: BorderRadius.circular(10),
                         ),
                       ),
                     ),
                   ),
+                ),
                   
-                  // Conteúdo minimizado
-                  if (currentHeight <= 200)
+                // Conteúdo minimizado
+                if (_currentHeight <= 200)
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 24),
                     child: Row(
@@ -135,7 +152,9 @@ class _DraggableBottomSheetState extends State<DraggableBottomSheet>
                           ),
                           child: Icon(Icons.photo_library, color: Colors.white),
                         ),
+
                         SizedBox(width: 16),
+
                         Expanded(
                           child: 
                           Column(
@@ -149,6 +168,7 @@ class _DraggableBottomSheetState extends State<DraggableBottomSheet>
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
+
                               Text(
                                 'Arraste para cima',
                                 style: TextStyle(
@@ -159,15 +179,15 @@ class _DraggableBottomSheetState extends State<DraggableBottomSheet>
                             ],
                           ),
                         ),
+
                         Icon(Icons.play_arrow, color: Colors.white, size: 32),
                       ],
                     ),
                   ),
                   
                   // Conteúdo adicional (expandido)
-                  if (currentHeight > 200)
-                    Expanded(child: ListPage(viewModel: context.read()))
-
+                  if (_currentHeight > 200)
+                    Expanded(child: widget.expandedContent)
                 ],
               ),
             ),

@@ -1,4 +1,4 @@
-import 'package:sprint4_app/data/models/label.dart';
+import 'package:sprint4_app/home/data/models/label.dart';
 
 class Prediction {
   final String id;

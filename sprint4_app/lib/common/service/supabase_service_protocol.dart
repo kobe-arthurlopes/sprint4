@@ -1,6 +1,6 @@
-import 'package:sprint4_app/data/models/image_label_result.dart';
-import 'package:sprint4_app/data/models/label.dart';
-import 'package:sprint4_app/data/models/prediction.dart';
+import 'package:sprint4_app/home/data/models/image_label_result.dart';
+import 'package:sprint4_app/home/data/models/label.dart';
+import 'package:sprint4_app/home/data/models/prediction.dart';
 
 abstract class SupabaseServiceProtocol {
   Future<void> authenticate();
