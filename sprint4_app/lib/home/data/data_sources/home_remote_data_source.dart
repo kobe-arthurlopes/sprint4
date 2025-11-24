@@ -11,11 +11,7 @@ class HomeRemoteDataSource {
   }
 
   Future<void> createResult(ImageLabelResult result) async {
-    final file = result.file;
-
-    if (file == null) return;
-
-    await supabaseService.createImageLabelResult(file);
+    await supabaseService.createImageLabelResult(result: result);
   }
 
   Future<void> deleteResult(String id) async {

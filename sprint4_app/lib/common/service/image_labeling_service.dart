@@ -7,8 +7,10 @@ import 'package:sprint4_app/home/data/models/label.dart';
 import 'package:sprint4_app/home/data/models/prediction.dart';
 
 class ImageLabelingService {
-  static Future<ImageLabelResult> getLabeledImage(File? file) async {
-    if (file == null) return ImageLabelResult();
+  static Future<ImageLabelResult> getLabeledImage(String filePath) async {
+    if (filePath.isEmpty) return ImageLabelResult();
+
+    final file = File(filePath);
 
     final bytes = await file.readAsBytes();
     final list = bytes.buffer.asUint8List();
@@ -25,7 +27,11 @@ class ImageLabelingService {
         )
         .toList();
 
-    return ImageLabelResult(predictions: predictions, file: file);
+    return ImageLabelResult(
+      predictions: predictions, 
+      filePath: filePath, 
+      file: file
+    );
   }
 
   static Future<List<Label>> fetchLabelsFromJson() async {

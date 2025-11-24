@@ -7,9 +7,9 @@ abstract class SupabaseServiceProtocol {
   Future<void> authenticate();
   Future<List<Label>> getLabels();
   Future<Label?> getLabel({required int id});
-  Future<void> createImageLabelResult(File file);
+  Future<void> createImageLabelResult({required ImageLabelResult result});
   Future<List<ImageLabelResult>> getImageLabelResults();
-  Future<void> updateImageLabelResult({required String id, String? filePath});
+  Future<void> updateImageLabelResult({required String id, File? newFile});
   Future<void> deleteImageLabelResult({required String id});
 
   Future<void> createPrediction({
@@ -28,4 +28,6 @@ abstract class SupabaseServiceProtocol {
   });
 
   Future<void> deletePrediction({required String id});
+
+  Future<String?> uploadImage({required File file, required String uid});
 }

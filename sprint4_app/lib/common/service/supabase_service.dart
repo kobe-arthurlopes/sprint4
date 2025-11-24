@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:path_provider/path_provider.dart';
 import 'package:sprint4_app/common/service/sign_in/sign_in_method.dart';
 import 'package:sprint4_app/common/service/supabase_service_protocol.dart';
 import 'package:sprint4_app/home/data/models/image_label_result.dart';
@@ -26,12 +27,12 @@ class SupabaseService implements SupabaseServiceProtocol {
   @override
   Future<void> authenticate() async {
     try {
-      final response = await _getAuthResponse();
+      // final response = await _getAuthResponse();
 
-      // final response = await _supabase.auth.signInWithPassword(
-      //   email: 'mocked.email@gmail.com',
-      //   password: '1234',
-      // );
+      final response = await _supabase.auth.signInWithPassword(
+        email: 'mocked.email@gmail.com',
+        password: '1234',
+      );
 
       if (response.user != null && response.session != null) {
         isAuthenticated = true;
@@ -89,10 +90,9 @@ class SupabaseService implements SupabaseServiceProtocol {
           .from('labels')
           .select()
           .eq('id', id)
-          .limit(1);
+          .single();
 
-      final item = data.first;
-      return Label.fromMap(item);
+      return Label.fromMap(data);
     } catch (error) {
       print('error getting label with id $id -> $error');
       return null;
@@ -100,24 +100,29 @@ class SupabaseService implements SupabaseServiceProtocol {
   }
 
   @override
-  Future<void> createImageLabelResult(File file) async {
+  Future<void> createImageLabelResult({
+    required ImageLabelResult result,
+  }) async {
     if (!isAuthenticated) return;
 
     final user = _supabase.auth.currentUser;
 
     if (user == null) return;
 
-    final filePath = await uploadImage(file: file, uid: user.id);
+    final file = result.file;
+
+    if (file == null) return;
+
+    final newFilePath = await uploadImage(file: file, uid: user.id);
 
     try {
       final data = await _supabase
           .from('image_label_results')
-          .insert({'user_id': user.id, 'file_path': filePath})
+          .insert({'user_id': user.id, 'file_path': newFilePath})
           .select()
-          .limit(1);
+          .single();
 
-      final item = data.first;
-      final result = ImageLabelResult.fromMap(item);
+      final result = ImageLabelResult.fromMap(data);
 
       print('created image label result with id ${result.id}');
     } catch (error) {
@@ -125,18 +130,64 @@ class SupabaseService implements SupabaseServiceProtocol {
     }
   }
 
+  @override
   Future<String?> uploadImage({required File file, required String uid}) async {
     final fileName = const Uuid().v4();
     final filePath = '$uid/$fileName.png';
     final storage = _supabase.storage.from('images');
 
     await storage.upload(
-      filePath, 
+      filePath,
       file,
       fileOptions: const FileOptions(upsert: false),
     );
 
     return filePath;
+  }
+
+  Future<ImageLabelResult> _getCompleteImageLabelResult({
+    required ImageLabelResult emptyResult,
+    required StorageFileApi storage,
+  }) async {
+    try {
+      final bytes = await storage.download(emptyResult.filePath);
+      final temp = File(
+        '${(await getTemporaryDirectory()).path}/${emptyResult.id}',
+      );
+      await temp.writeAsBytes(bytes);
+      emptyResult.file = temp;
+    } catch (error) {
+      print("error downloading image ${emptyResult.id}: $error");
+      emptyResult.file = null;
+    }
+
+    final predictions = await getPredictions(resultId: emptyResult.id);
+    emptyResult.predictions = predictions;
+
+    return emptyResult;
+  }
+
+  Future<ImageLabelResult?> _getImageLabelResult({required String id}) async {
+    if (!isAuthenticated) return null;
+
+    try {
+      final data = await _supabase
+          .from('image_label_results')
+          .select()
+          .eq('id', id)
+          .single();
+
+      final storage = _supabase.storage.from('images');
+      final emptyResult = ImageLabelResult.fromMap(data);
+
+      return await _getCompleteImageLabelResult(
+        emptyResult: emptyResult,
+        storage: storage,
+      );
+    } catch (error) {
+      print('error getting image label result with id $id -> $error');
+      return null;
+    }
   }
 
   @override
@@ -145,15 +196,20 @@ class SupabaseService implements SupabaseServiceProtocol {
 
     try {
       final data = await _supabase.from('image_label_results').select();
+      final storage = _supabase.storage.from('images');
 
-      final imageLabelResultFutures = data.map((element) async {
-        var result = ImageLabelResult.fromMap(element);
-        final predictions = await getPredictions(resultId: result.id);
-        result.predictions = predictions;
-        return result;
-      }).toList();
+      final results = await Future.wait(
+        data.map((item) async {
+          final emptyResult = ImageLabelResult.fromMap(item);
 
-      return await Future.wait(imageLabelResultFutures);
+          return await _getCompleteImageLabelResult(
+            emptyResult: emptyResult,
+            storage: storage,
+          );
+        }).toList(),
+      );
+
+      return results;
     } catch (error) {
       print('error getting image label results -> $error');
       return [];
@@ -163,20 +219,26 @@ class SupabaseService implements SupabaseServiceProtocol {
   @override
   Future<void> updateImageLabelResult({
     required String id,
-    String? filePath,
+    File? newFile,
   }) async {
-    if (!isAuthenticated) return;
+    // if (!isAuthenticated) return;
 
-    try {
-      await _supabase
-          .from('image_label_results')
-          .update({'file_path': filePath})
-          .eq('id', id);
+    // final current = await _supabase
+    //     .from('image_label_results')
+    //     .select()
+    //     .eq('id', id)
+    //     .single();
 
-      print('updated image label result with id $id');
-    } catch (error) {
-      print('error upating image label result with id $id -> $error');
-    }
+    // try {
+    //   await _supabase
+    //       .from('image_label_results')
+    //       .update({'file_path': filePath})
+    //       .eq('id', id);
+
+    //   print('updated image label result with id $id');
+    // } catch (error) {
+    //   print('error upating image label result with id $id -> $error');
+    // }
   }
 
   @override

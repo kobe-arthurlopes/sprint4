@@ -9,7 +9,7 @@ class HomeViewModel extends ChangeNotifier {
 
   HomeViewModel({required this.repository});
 
-  ImageLabelResult imageLabelResult = ImageLabelResult();
+  ImageLabelResult currentResult = ImageLabelResult();
   bool isLoading = false;
   List<ImageLabelResult> results = [];
 
@@ -18,22 +18,36 @@ class HomeViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> upateImageLabelResult(File imageFile) async {
-    imageLabelResult = await ImageLabelingService.getLabeledImage(imageFile);
+  Future<void> upateImageLabelResult(String filePath) async {
+    currentResult = await ImageLabelingService.getLabeledImage(filePath);
+    currentResult.filePath = filePath;
     notifyListeners();
   }
 
   Future<void> createData() async {
-    await repository.createData(imageLabelResult);
+    _startLoading();
+    await repository.createResult(currentResult);
+    _stopLoading();
   }
 
   Future<void> refreshResults() async {
+    _startLoading();
+    await fetch();
+    _stopLoading();
+  }
+
+  void _startLoading() {
     isLoading = true;
     notifyListeners();
+  }
 
-    await fetch();
-
+  void _stopLoading() {
     isLoading = false;
+    notifyListeners();
+  }
+
+  void resetCurrentResult() {
+    currentResult = ImageLabelResult();
     notifyListeners();
   }
 }

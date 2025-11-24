@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sprint4_app/home/data/models/image_label_result.dart';
@@ -6,16 +5,18 @@ import 'package:sprint4_app/home/presentation/components/pulsing_button.dart';
 
 class ImagePickerWidget extends StatefulWidget {
   final ImageLabelResult imageLabelResult;
-  final void Function(File) shouldLabelFile;
+  final void Function(String) shouldLabelFile;
   final void Function(bool) onToggleBottomSheet;
   final void Function() onSave;
+  final void Function() onClose;
 
   const ImagePickerWidget({
-    super.key, 
+    super.key,
     required this.imageLabelResult,
     required this.shouldLabelFile,
     required this.onToggleBottomSheet,
     required this.onSave,
+    required this.onClose,
   });
 
   @override
@@ -30,8 +31,7 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
     final pickedImage = await _picker.pickImage(source: _imageSource);
 
     if (pickedImage != null) {
-      final imageFile = File(pickedImage.path);
-      widget.shouldLabelFile(imageFile);
+      widget.shouldLabelFile(pickedImage.path);
       setState(() {});
     }
   }
@@ -88,12 +88,10 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
 
                         CloseButton(
                           onPressed: () {
-                            setState(() {
-                              widget.imageLabelResult.file = null;
-                              widget.onToggleBottomSheet(true);
-                            });
+                            widget.onClose();
+                            widget.onToggleBottomSheet(true);
                           },
-                        )
+                        ),
                       ],
                     ),
 
@@ -105,20 +103,20 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
                         fit: BoxFit.cover,
                       ),
                     ),
-    
+
                     SizedBox(height: 20),
-    
+
                     ..._getLabeledImagesWidget(),
                   ],
                 ),
               ),
       ),
-      
+
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: widget.imageLabelResult.file == null 
-            ? SizedBox() 
+        child: widget.imageLabelResult.file == null
+            ? SizedBox()
             : Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -130,7 +128,7 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
                     },
                     child: Icon(Icons.camera_alt),
                   ),
-          
+
                   FloatingActionButton(
                     heroTag: 'fab_gallery',
                     onPressed: () {
@@ -149,7 +147,7 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
                     child: Icon(Icons.save),
                   ),
                 ],
-            ),
+              ),
       ),
     );
   }

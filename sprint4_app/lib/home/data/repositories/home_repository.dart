@@ -11,7 +11,7 @@ class HomeRepository extends ChangeNotifier {
     return await remote.fetch();
   }
 
-  Future<void> createData(ImageLabelResult result) async {
+  Future<void> createResult(ImageLabelResult result) async {
     await remote.createResult(result);
   }
 }

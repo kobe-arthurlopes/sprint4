@@ -36,19 +36,23 @@ class _MyHomePageState extends State<HomePage> with TickerProviderStateMixin {
             body: Stack(
               children: [
                 ImagePickerWidget(
-                  imageLabelResult: viewModel.imageLabelResult,
-                  shouldLabelFile: (imageFile) async {
-                    viewModel.upateImageLabelResult(imageFile);
+                  imageLabelResult: viewModel.currentResult,
+                  shouldLabelFile: (filePath) async {
+                    viewModel.upateImageLabelResult(filePath);
                   },
                   onToggleBottomSheet: (shouldShowBottomSheet) {
-                    setState(() => _shouldShowBottomSheet = shouldShowBottomSheet);
+                    setState(
+                      () => _shouldShowBottomSheet = shouldShowBottomSheet,
+                    );
                   },
-                  onSave: () {
-                    // viewModel.createData();
-                    viewModel.isLoading = false;
+                  onSave: () async {
+                    await viewModel.createData();
+                  },
+                  onClose: () {
+                    viewModel.resetCurrentResult();
                   },
                 ),
-                
+
                 if (_shouldShowBottomSheet)
                   DraggableBottomSheet(
                     expandedContent: ResultsGrid(
