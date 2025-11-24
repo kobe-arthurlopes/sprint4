@@ -1,9 +1,11 @@
+import 'dart:io';
 import 'package:sprint4_app/common/service/sign_in/sign_in_method.dart';
 import 'package:sprint4_app/common/service/supabase_service_protocol.dart';
 import 'package:sprint4_app/home/data/models/image_label_result.dart';
 import 'package:sprint4_app/home/data/models/label.dart';
 import 'package:sprint4_app/home/data/models/prediction.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:uuid/uuid.dart';
 
 class SupabaseService implements SupabaseServiceProtocol {
   late final SupabaseClient _supabase;
@@ -98,12 +100,14 @@ class SupabaseService implements SupabaseServiceProtocol {
   }
 
   @override
-  Future<void> createImageLabelResult({String? filePath}) async {
+  Future<void> createImageLabelResult(File file) async {
     if (!isAuthenticated) return;
 
     final user = _supabase.auth.currentUser;
 
     if (user == null) return;
+
+    final filePath = await uploadImage(file: file, uid: user.id);
 
     try {
       final data = await _supabase
@@ -119,6 +123,20 @@ class SupabaseService implements SupabaseServiceProtocol {
     } catch (error) {
       print('error creatings image label result -> $error');
     }
+  }
+
+  Future<String?> uploadImage({required File file, required String uid}) async {
+    final fileName = const Uuid().v4();
+    final filePath = '$uid/$fileName.png';
+    final storage = _supabase.storage.from('images');
+
+    await storage.upload(
+      filePath, 
+      file,
+      fileOptions: const FileOptions(upsert: false),
+    );
+
+    return filePath;
   }
 
   @override

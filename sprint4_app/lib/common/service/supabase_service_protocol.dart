@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:sprint4_app/home/data/models/image_label_result.dart';
 import 'package:sprint4_app/home/data/models/label.dart';
 import 'package:sprint4_app/home/data/models/prediction.dart';
@@ -6,7 +7,7 @@ abstract class SupabaseServiceProtocol {
   Future<void> authenticate();
   Future<List<Label>> getLabels();
   Future<Label?> getLabel({required int id});
-  Future<void> createImageLabelResult({String? filePath});
+  Future<void> createImageLabelResult(File file);
   Future<List<ImageLabelResult>> getImageLabelResults();
   Future<void> updateImageLabelResult({required String id, String? filePath});
   Future<void> deleteImageLabelResult({required String id});
