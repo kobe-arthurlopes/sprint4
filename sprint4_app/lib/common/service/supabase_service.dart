@@ -2,19 +2,18 @@ import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:sprint4_app/common/service/sign_in/sign_in_method.dart';
 import 'package:sprint4_app/common/service/supabase_service_protocol.dart';
-import 'package:sprint4_app/home/data/models/image_label_result.dart';
-import 'package:sprint4_app/home/data/models/label.dart';
-import 'package:sprint4_app/home/data/models/prediction.dart';
+import 'package:sprint4_app/common/models/image_label_result.dart';
+import 'package:sprint4_app/common/models/label.dart';
+import 'package:sprint4_app/common/models/prediction.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 
 class SupabaseService implements SupabaseServiceProtocol {
   late final SupabaseClient _supabase;
   bool isAuthenticated = false;
-  SignInMethod signInMethod = SignInMethod.google;
 
-  // String? _email;
-  // String? _password;
+  @override
+  SignInMethod signInMethod = SignInMethod.unknown;
 
   SupabaseService() {
     _initialize();
@@ -25,14 +24,21 @@ class SupabaseService implements SupabaseServiceProtocol {
   }
 
   @override
+  bool hasExistingSession() {
+    final existingSession = _supabase.auth.currentSession;
+    isAuthenticated = existingSession != null;
+    return existingSession != null;
+  }
+
+  @override
   Future<void> authenticate() async {
     try {
-      // final response = await _getAuthResponse();
+      final response = await _getAuthResponse();
 
-      final response = await _supabase.auth.signInWithPassword(
-        email: 'mocked.email@gmail.com',
-        password: '1234',
-      );
+      // final response = await _supabase.auth.signInWithPassword(
+      //   email: 'mocked.email@gmail.com',
+      //   password: '1234',
+      // );
 
       if (response.user != null && response.session != null) {
         isAuthenticated = true;
