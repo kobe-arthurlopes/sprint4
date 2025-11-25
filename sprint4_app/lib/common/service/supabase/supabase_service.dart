@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
-import 'package:sprint4_app/common/service/sign_in/sign_in_method.dart';
-import 'package:sprint4_app/common/service/supabase_service_protocol.dart';
+import 'package:sprint4_app/common/service/authentication/authentication_service_protocol.dart';
+import 'package:sprint4_app/common/service/supabase/supabase_service_protocol.dart';
 import 'package:sprint4_app/common/models/image_label_result.dart';
 import 'package:sprint4_app/common/models/label.dart';
 import 'package:sprint4_app/common/models/prediction.dart';
@@ -10,82 +10,23 @@ import 'package:uuid/uuid.dart';
 
 class SupabaseService implements SupabaseServiceProtocol {
   late final SupabaseClient _supabase;
-  bool isAuthenticated = false;
 
   @override
-  SignInMethod signInMethod = SignInMethod.emailPassword;
+  late final AuthenticationServiceProtocol authentication;
 
-  @override
-  String email = '';
-
-  @override
-  String password = '';
-
-  SupabaseService() {
+  SupabaseService({required this.authentication}) {
     _initialize();
   }
 
   Future<void> _initialize() async {
     _supabase = Supabase.instance.client;
+    authentication.setClient(_supabase.auth);
   }
 
-  @override
-  bool hasExistingSession() {
-    final existingSession = _supabase.auth.currentSession;
-    isAuthenticated = existingSession != null;
-    return existingSession != null;
-  }
-
-  @override
-  Future<void> authenticate() async {
-    try {
-      final response = await _getAuthResponse();
-
-      if (response.user != null && response.session != null) {
-        isAuthenticated = true;
-        print("login succeeded — userId: ${response.user!.id}");
-        return;
-      }
-
-      isAuthenticated = false;
-      print("login failed — userId: ${response.user?.id}");
-    } catch (error) {
-      print('error authenticating on Supabase -> $error');
-    }
-  }
-
-  Future<AuthResponse> _getAuthResponse() async {
-    final signInService = signInMethod.signInService();
-    final oAuthProvider = signInMethod.oAuthProvider();
-    final rawNonce = _supabase.auth.generateRawNonce();
-
-    final auth = _supabase.auth;
-
-    if (signInService == null || oAuthProvider == null) {
-      return await auth.signInWithPassword(
-        email: email,
-        password: password,
-      );
-    }
-
-    final idToken = await signInService.getIdToken(rawNonce: rawNonce);
-
-    if (idToken == null) {
-      throw const AuthException(
-        'Could not find ID Token from generated credential.',
-      );
-    }
-
-    return await auth.signInWithIdToken(
-      provider: oAuthProvider,
-      idToken: idToken,
-      nonce: rawNonce,
-    );
-  }
-
+  // LABELS
   @override
   Future<List<Label>> getLabels() async {
-    if (!isAuthenticated) return [];
+    if (!authentication.isAuthenticated) return [];
 
     try {
       final data = await _supabase.from('labels').select();
@@ -99,7 +40,7 @@ class SupabaseService implements SupabaseServiceProtocol {
 
   @override
   Future<Label?> getLabel({required int id}) async {
-    if (!isAuthenticated) return null;
+    if (!authentication.isAuthenticated) return null;
 
     try {
       final data = await _supabase
@@ -115,11 +56,12 @@ class SupabaseService implements SupabaseServiceProtocol {
     }
   }
 
+  // IMAGE LABEL RESULT
   @override
   Future<void> createImageLabelResult({
     required ImageLabelResult result,
   }) async {
-    if (!isAuthenticated) return;
+    if (!authentication.isAuthenticated) return;
 
     final user = _supabase.auth.currentUser;
 
@@ -196,7 +138,7 @@ class SupabaseService implements SupabaseServiceProtocol {
     required String id,
     required StorageFileApi storage,
   }) async {
-    if (!isAuthenticated) return null;
+    if (!authentication.isAuthenticated) return null;
 
     try {
       final data = await _supabase
@@ -219,7 +161,7 @@ class SupabaseService implements SupabaseServiceProtocol {
 
   @override
   Future<List<ImageLabelResult>> getImageLabelResults() async {
-    if (!isAuthenticated) return [];
+    if (!authentication.isAuthenticated) return [];
 
     final storage = _supabase.storage.from('images');
 
@@ -246,7 +188,7 @@ class SupabaseService implements SupabaseServiceProtocol {
     File? newFile,
     List<Prediction>? newPredictions,
   }) async {
-    if (!isAuthenticated) return;
+    if (!authentication.isAuthenticated) return;
 
     final user = _supabase.auth.currentUser;
 
@@ -302,7 +244,7 @@ class SupabaseService implements SupabaseServiceProtocol {
 
   @override
   Future<void> deleteImageLabelResult({required String id}) async {
-    if (!isAuthenticated) return;
+    if (!authentication.isAuthenticated) return;
 
     try {
       final data = await _supabase
@@ -326,13 +268,14 @@ class SupabaseService implements SupabaseServiceProtocol {
     await storage.remove([filePath]);
   }
 
+  // PREDICTION
   @override
   Future<void> createPrediction({
     required String resultId,
     required int labelId,
     required double confidence,
   }) async {
-    if (!isAuthenticated) return;
+    if (!authentication.isAuthenticated) return;
 
     try {
       final data = await _supabase
@@ -355,7 +298,7 @@ class SupabaseService implements SupabaseServiceProtocol {
 
   @override
   Future<List<Prediction>> getPredictions({String? resultId}) async {
-    if (!isAuthenticated) return [];
+    if (!authentication.isAuthenticated) return [];
 
     try {
       final List<Map<String, dynamic>> data;
@@ -390,7 +333,7 @@ class SupabaseService implements SupabaseServiceProtocol {
     int? labelId,
     double? confidence,
   }) async {
-    if (!isAuthenticated) return;
+    if (!authentication.isAuthenticated) return;
 
     if (resultId == null && labelId == null && confidence == null) {
       print('no proprerties passed to update prediction with id $id');
@@ -414,7 +357,7 @@ class SupabaseService implements SupabaseServiceProtocol {
 
   @override
   Future<void> deletePrediction({required String id}) async {
-    if (!isAuthenticated) return;
+    if (!authentication.isAuthenticated) return;
 
     try {
       await _supabase.from('predictions').delete().eq('id', id);

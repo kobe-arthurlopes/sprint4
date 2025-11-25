@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:sprint4_app/common/service/authentication/authentication_service.dart';
 import 'package:sprint4_app/common/service/sign_in/sign_in_method.dart';
-import 'package:sprint4_app/common/service/supabase_service.dart';
+import 'package:sprint4_app/common/service/supabase/supabase_service.dart';
 import 'package:sprint4_app/home/data/data_sources/home_remote_data_source.dart';
 import 'package:sprint4_app/home/data/repositories/home_repository.dart';
 import 'package:sprint4_app/home/presentation/view_models/home_view_model.dart';
@@ -15,20 +16,23 @@ Future<void> injectDependencies() async {
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhyZWxuc21yZmp2eWlhbXpwc2JwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM0MjI1MTQsImV4cCI6MjA3ODk5ODUxNH0.TOXF9JREDosuSi-Dn34ptk0RWe-y9lNcfZ_8dONW95s',
   );
 
-  final supabaseService = SupabaseService();
+  final authenticationService = AuthenticationService();
+  final supabaseService = SupabaseService(authentication: authenticationService);
 
   // Forma de chamar o autenticação do Supabase
-  final hasExistingSession = supabaseService.hasExistingSession();
+  final hasExistingSession = supabaseService.authentication.hasExistingSession();
 
   if (!hasExistingSession) {
-    supabaseService.signInMethod = SignInMethod.apple;
+    supabaseService.authentication.configureSignIn(method: SignInMethod.apple);
 
-    // Se o SignInMethod for emailPassword deve ser passado o email e senha de antemão
-    // supabaseService.signInMethod = SignInMethod.emailPassword;
-    // supabaseService.email = 'mocked.email@gmail.com';
-    // supabaseService.password = '1234';
+    // Se o SignInMethod for emailPassword devem ser passados também o email e senha 
+    supabaseService.authentication.configureSignIn(
+      method: SignInMethod.emailPassword,
+      email: 'mocked.email@gmail.com',
+      password: '1234',
+    );
 
-    await supabaseService.authenticate();
+    await supabaseService.authentication.run();
   } else {
     print('user already logged in');
   }

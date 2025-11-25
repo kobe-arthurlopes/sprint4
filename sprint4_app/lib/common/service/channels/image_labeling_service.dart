@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/services.dart';
-import 'package:sprint4_app/common/service/method_channel_type.dart';
+import 'package:sprint4_app/common/service/channels/method_channel_type.dart';
 import 'package:sprint4_app/common/models/image_label_result.dart';
 import 'package:sprint4_app/common/models/label.dart';
 import 'package:sprint4_app/common/models/prediction.dart';

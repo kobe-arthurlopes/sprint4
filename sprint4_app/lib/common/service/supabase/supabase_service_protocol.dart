@@ -2,15 +2,11 @@ import 'dart:io';
 import 'package:sprint4_app/common/models/image_label_result.dart';
 import 'package:sprint4_app/common/models/label.dart';
 import 'package:sprint4_app/common/models/prediction.dart';
-import 'package:sprint4_app/common/service/sign_in/sign_in_method.dart';
+import 'package:sprint4_app/common/service/authentication/authentication_service_protocol.dart';
 
 abstract class SupabaseServiceProtocol {
-  SignInMethod get signInMethod;
-  String get email;
-  String get password;
+  AuthenticationServiceProtocol get authentication;
 
-  bool hasExistingSession();
-  Future<void> authenticate();
   Future<List<Label>> getLabels();
   Future<Label?> getLabel({required int id});
   Future<void> createImageLabelResult({required ImageLabelResult result});
