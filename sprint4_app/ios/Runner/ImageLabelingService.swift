@@ -3,42 +3,10 @@ import Flutter
 import MLKitVision
 import MLKitImageLabeling
 
-class MethodChannelService {
-    private let channelName = "com.sprint4/image_labeling"
-    private let channel: FlutterMethodChannel
+final class ImageLabelingService {
+    private init() {}
     
-    init(binaryMessenger: FlutterBinaryMessenger) {
-        channel = FlutterMethodChannel(name: channelName, binaryMessenger: binaryMessenger)
-    }
-    
-    func setMethodCallHandler() {
-        channel.setMethodCallHandler {
-            [weak self] call,
-            result in
-            guard let self else { return }
-            
-            if call.method == "labelImage" {
-                guard let args = call.arguments as? [String: Any],
-                      let bytes = args["bytes"] as? FlutterStandardTypedData else {
-                    
-                  result(FlutterError(
-                    code: "INVALID_ARGUMENTS",
-                    message: "Missing image bytes",
-                    details: nil
-                  ))
-                    
-                  return
-                }
-                
-                self.labelImage(withBytes: bytes, result: result)
-                
-            } else {
-                result(FlutterMethodNotImplemented)
-            }
-        }
-    }
-    
-    private func labelImage(withBytes bytes: FlutterStandardTypedData? = nil, result: @escaping FlutterResult) {
+    static func labelImage(withBytes bytes: FlutterStandardTypedData? = nil, result: @escaping FlutterResult) {
         guard let bytes, let uiImage = UIImage(data: bytes.data) else {
             result(FlutterError(
                 code: "INVALID_IMAGE",
@@ -87,3 +55,4 @@ class MethodChannelService {
         }
     }
 }
+

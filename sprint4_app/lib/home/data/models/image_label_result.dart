@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:sprint4_app/home/data/models/prediction.dart';
 
 class ImageLabelResult {
