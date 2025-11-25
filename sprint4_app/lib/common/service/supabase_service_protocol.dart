@@ -6,6 +6,8 @@ import 'package:sprint4_app/common/service/sign_in/sign_in_method.dart';
 
 abstract class SupabaseServiceProtocol {
   SignInMethod get signInMethod;
+  String get email;
+  String get password;
 
   bool hasExistingSession();
   Future<void> authenticate();

@@ -22,6 +22,12 @@ Future<void> injectDependencies() async {
 
   if (!hasExistingSession) {
     supabaseService.signInMethod = SignInMethod.apple;
+
+    // Se o SignInMethod for emailPassword deve ser passado o email e senha de antemão
+    // supabaseService.signInMethod = SignInMethod.emailPassword;
+    // supabaseService.email = 'mocked.email@gmail.com';
+    // supabaseService.password = '1234';
+
     await supabaseService.authenticate();
   } else {
     print('user already logged in');

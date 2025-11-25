@@ -6,27 +6,27 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 enum SignInMethod {
   apple,
   google,
-  unknown;
+  emailPassword;
 
-  SignInProtocol signInService() {
+  SignInProtocol? signInService() {
     switch (this) {
       case SignInMethod.apple:
         return AppleSignInService();
       case SignInMethod.google:
         return GoogleSignInService();
-      case SignInMethod.unknown:
-        return GoogleSignInService();
+      case SignInMethod.emailPassword:
+        return null;
     }
   }
 
-  OAuthProvider oAuthProvider() {
+  OAuthProvider? oAuthProvider() {
     switch (this) {
       case SignInMethod.apple:
         return OAuthProvider.apple;
       case SignInMethod.google:
         return OAuthProvider.google;
-      case SignInMethod.unknown:
-        return OAuthProvider.google;
+      case SignInMethod.emailPassword:
+        return null;
     }
   }
 }

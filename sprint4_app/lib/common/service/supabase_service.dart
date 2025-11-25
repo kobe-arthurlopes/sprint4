@@ -13,7 +13,13 @@ class SupabaseService implements SupabaseServiceProtocol {
   bool isAuthenticated = false;
 
   @override
-  SignInMethod signInMethod = SignInMethod.unknown;
+  SignInMethod signInMethod = SignInMethod.emailPassword;
+
+  @override
+  String email = '';
+
+  @override
+  String password = '';
 
   SupabaseService() {
     _initialize();
@@ -35,11 +41,6 @@ class SupabaseService implements SupabaseServiceProtocol {
     try {
       final response = await _getAuthResponse();
 
-      // final response = await _supabase.auth.signInWithPassword(
-      //   email: 'mocked.email@gmail.com',
-      //   password: '1234',
-      // );
-
       if (response.user != null && response.session != null) {
         isAuthenticated = true;
         print("login succeeded — userId: ${response.user!.id}");
@@ -58,6 +59,15 @@ class SupabaseService implements SupabaseServiceProtocol {
     final oAuthProvider = signInMethod.oAuthProvider();
     final rawNonce = _supabase.auth.generateRawNonce();
 
+    final auth = _supabase.auth;
+
+    if (signInService == null || oAuthProvider == null) {
+      return await auth.signInWithPassword(
+        email: email,
+        password: password,
+      );
+    }
+
     final idToken = await signInService.getIdToken(rawNonce: rawNonce);
 
     if (idToken == null) {
@@ -66,7 +76,7 @@ class SupabaseService implements SupabaseServiceProtocol {
       );
     }
 
-    return _supabase.auth.signInWithIdToken(
+    return await auth.signInWithIdToken(
       provider: oAuthProvider,
       idToken: idToken,
       nonce: rawNonce,
