@@ -17,6 +17,12 @@ class AppleSignInService implements SignInProtocol {
         AppleIDAuthorizationScopes.fullName,
       ],
       nonce: hashedNonce,
+      webAuthenticationOptions: WebAuthenticationOptions(
+        clientId: 'com.example.sprint4App.auth', 
+        redirectUri: Uri.parse(
+          'https://xrelnsmrfjvyiamzpsbp.supabase.co/auth/v1/callback'
+        )
+      ),
     );
 
     return credential.identityToken;

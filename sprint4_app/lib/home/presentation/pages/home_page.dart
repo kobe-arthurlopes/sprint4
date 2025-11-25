@@ -14,8 +14,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<HomePage> with TickerProviderStateMixin {
-  bool _shouldShowBottomSheet = true;
-
   @override
   void initState() {
     super.initState();
@@ -36,20 +34,29 @@ class _MyHomePageState extends State<HomePage> with TickerProviderStateMixin {
             body: Stack(
               children: [
                 ImagePickerWidget(
-                  imageLabelResult: viewModel.imageLabelResult,
-                  shouldLabelFile: (imageFile) async {
-                    viewModel.upateImageLabelResult(imageFile);
+                  imageLabelResult: viewModel.currentResult,
+                  shouldLabelFile: (filePath) async {
+                    viewModel.upateImageLabelResult(filePath);
                   },
                   onToggleBottomSheet: (shouldShowBottomSheet) {
-                    setState(() => _shouldShowBottomSheet = shouldShowBottomSheet);
+                    viewModel.updateShouldShowBottomSheet(
+                      value: shouldShowBottomSheet,
+                    );
                   },
-                  onSave: () {
-                    // viewModel.createData();
-                    viewModel.isLoading = false;
+                  onSave: () async {
+                    // TODO: - Colocar loading
+
+                    await viewModel.createData();
+                    await viewModel.fetch();
+                    viewModel.resetCurrentResult();
+                    viewModel.updateShouldShowBottomSheet(value: true);
+                  },
+                  onClose: () {
+                    viewModel.resetCurrentResult();
                   },
                 ),
-                
-                if (_shouldShowBottomSheet)
+
+                if (viewModel.shouldShowBottomSheet)
                   DraggableBottomSheet(
                     expandedContent: ResultsGrid(
                       results: viewModel.results,

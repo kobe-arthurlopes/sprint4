@@ -1,14 +1,23 @@
-import 'package:sprint4_app/home/data/models/image_label_result.dart';
-import 'package:sprint4_app/home/data/models/label.dart';
-import 'package:sprint4_app/home/data/models/prediction.dart';
+import 'dart:io';
+import 'package:sprint4_app/common/models/image_label_result.dart';
+import 'package:sprint4_app/common/models/label.dart';
+import 'package:sprint4_app/common/models/prediction.dart';
+import 'package:sprint4_app/common/service/authentication/authentication_service_protocol.dart';
 
 abstract class SupabaseServiceProtocol {
-  Future<void> authenticate();
+  AuthenticationServiceProtocol get authentication;
+
   Future<List<Label>> getLabels();
   Future<Label?> getLabel({required int id});
-  Future<void> createImageLabelResult({String? filePath});
+  Future<void> createImageLabelResult({required ImageLabelResult result});
   Future<List<ImageLabelResult>> getImageLabelResults();
-  Future<void> updateImageLabelResult({required String id, String? filePath});
+
+  Future<void> updateImageLabelResult({
+    required String id, 
+    File? newFile,
+    List<Prediction>? newPredictions,
+  });
+
   Future<void> deleteImageLabelResult({required String id});
 
   Future<void> createPrediction({

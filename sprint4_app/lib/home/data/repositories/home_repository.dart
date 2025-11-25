@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sprint4_app/home/data/data_sources/home_remote_data_source.dart';
-import 'package:sprint4_app/home/data/models/image_label_result.dart';
+import 'package:sprint4_app/common/models/image_label_result.dart';
 
 class HomeRepository extends ChangeNotifier {
   final HomeRemoteDataSource remote;
@@ -11,7 +11,7 @@ class HomeRepository extends ChangeNotifier {
     return await remote.fetch();
   }
 
-  Future<void> createData(ImageLabelResult result) async {
+  Future<void> createResult(ImageLabelResult result) async {
     await remote.createResult(result);
   }
 }
