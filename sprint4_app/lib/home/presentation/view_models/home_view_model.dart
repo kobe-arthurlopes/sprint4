@@ -11,6 +11,7 @@ class HomeViewModel extends ChangeNotifier {
   ImageLabelResult currentResult = ImageLabelResult();
   bool isLoading = false;
   List<ImageLabelResult> results = [];
+  bool shouldShowBottomSheet = true;
 
   Future<void> fetch() async {
     results = await repository.fetchData();
@@ -24,9 +25,7 @@ class HomeViewModel extends ChangeNotifier {
   }
 
   Future<void> createData() async {
-    _startLoading();
     await repository.createResult(currentResult);
-    _stopLoading();
   }
 
   Future<void> refreshResults() async {
@@ -47,6 +46,11 @@ class HomeViewModel extends ChangeNotifier {
 
   void resetCurrentResult() {
     currentResult = ImageLabelResult();
+    notifyListeners();
+  }
+
+  void updateShouldShowBottomSheet({required bool value}) {
+    shouldShowBottomSheet = value;
     notifyListeners();
   }
 }
