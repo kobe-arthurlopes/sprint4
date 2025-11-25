@@ -2,9 +2,9 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:sprint4_app/common/service/method_channel_type.dart';
-import 'package:sprint4_app/home/data/models/image_label_result.dart';
-import 'package:sprint4_app/home/data/models/label.dart';
-import 'package:sprint4_app/home/data/models/prediction.dart';
+import 'package:sprint4_app/common/models/image_label_result.dart';
+import 'package:sprint4_app/common/models/label.dart';
+import 'package:sprint4_app/common/models/prediction.dart';
 
 class ImageLabelingService {
   static Future<ImageLabelResult> getLabeledImage(String filePath) async {

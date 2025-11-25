@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sprint4_app/home/data/models/image_label_result.dart';
+import 'package:sprint4_app/common/models/image_label_result.dart';
 import 'package:sprint4_app/common/service/image_labeling_service.dart';
 import 'package:sprint4_app/home/data/repositories/home_repository.dart';
 

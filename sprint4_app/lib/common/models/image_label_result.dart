@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:sprint4_app/home/data/models/prediction.dart';
+import 'package:sprint4_app/common/models/prediction.dart';
 
 class ImageLabelResult {
   final String id;

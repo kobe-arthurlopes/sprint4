@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:sprint4_app/home/data/models/image_label_result.dart';
+import 'package:sprint4_app/common/models/image_label_result.dart';
 import 'package:sprint4_app/home/presentation/components/pulsing_button.dart';
 
 class ImagePickerWidget extends StatefulWidget {
