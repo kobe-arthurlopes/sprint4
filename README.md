@@ -159,3 +159,76 @@ do <a href="https://developers.google.com/ml-kit" target="_blank">Google ML Kit<
   }
   ```
 
+---------
+
+**Serviços em Nuvem**
+
+- Para armazenamento das imagens classificadas pelo Google ML Kit, o app utiliza o ``Supabase`` como 0 serviço em nuvem que armazena seu banco de dados.
+- Todas as tabelas, ativação de Row-Level Security, policies e configuração de storage foi usado a seção ``SQL Editor`` do Supabase. As tabelas criadas foram:
+
+  ```sql
+  -- Criação da tabela para o objeto Label
+  -- Label representa as 446 categorias disponibilizadas pelo ML Kit para o Image Labeling
+  create table public.labels(
+    id integer primary key,
+    text text unique not null
+  );
+
+  -- Aciona RLS (Row-Level Security) para a tabela 'labels'
+  alter table public.labels enable row level security;
+
+  -- Depois de ativar o RLS, cria-se policies que indicam regras para o acesso da tabela 'labels'
+  -- Essa policy permite que qualquer pessoa possa ler os dados dessa tabela
+  create policy "Anyone can read labels"
+	on public.labels
+	for select
+	using (true);
+  ```
+
+  ```sql
+  -- Criação da tabela para o objeto ImageLabelResult
+  -- ImageLabelResult representa o resultado de uma imagem classificada pelo ML Kit
+  -- o método gen_random_uuid() sempre gera um UUID aleatório para a propriedade id
+  -- a propriedade user_id aponta para auth.users(id), que guarda o id dos usuários logados
+  -- 'on delete cascade' significa que se um user for removido, seus ImageLabelResults também serão
+  -- file_path é o caminho para a imagem classificada
+  
+  create table public.image_label_results(
+  	id uuid primary key default gen_random_uuid(),
+  	user_id uuid not null references auth.users(id) on delete cascade, 
+  	file_path text not null
+  );
+
+  -- Aciona RLS para a tabela 'image_label_results'
+  alter table public.image_label_results enable row level security;
+
+  -- Criação das policies da tabela:
+
+  -- Usuários poderão ler todas as ImageLabelResults que tiverem user_id
+  -- igual ao seu id de usário
+  create policy “Users can read their own results”
+	on public.image_label_results
+	for select
+	using (auth.uid() = user_id);
+
+  -- Usuários poderão criar ImageLabelResults que tenham user_id
+  -- igual ao seu id de usuário
+  create policy “Users can create their own results”
+  on public.image_label_results
+  for insert
+  with check (auth.uid() = user_id);
+
+  -- Usuários poderão atualizar ImageLabelResults que tiverem
+  -- user_id igual ao seu id de usuário
+  create policy “Users can update their own results”
+  on public.image_label_results
+  for update
+  using (auth.uid() = user_id)
+  with check (auth.uid() = user_id);
+  
+  create policy “Users can delete their own results”
+  on public.image_label_results
+  for delete
+  using (auth.uid() = user_id);
+  ```
+
