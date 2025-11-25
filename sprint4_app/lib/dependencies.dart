@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:sprint4_app/common/service/sign_in/sign_in_method.dart';
 import 'package:sprint4_app/common/service/supabase_service.dart';
 import 'package:sprint4_app/home/data/data_sources/home_remote_data_source.dart';
 import 'package:sprint4_app/home/data/repositories/home_repository.dart';
@@ -15,7 +16,16 @@ Future<void> injectDependencies() async {
   );
 
   final supabaseService = SupabaseService();
-  await supabaseService.authenticate();
+
+  // Forma de chamar o autenticação do Supabase
+  final hasExistingSession = supabaseService.hasExistingSession();
+
+  if (!hasExistingSession) {
+    supabaseService.signInMethod = SignInMethod.apple;
+    await supabaseService.authenticate();
+  } else {
+    print('user already logged in');
+  }
 
   runApp(
     MultiProvider(
