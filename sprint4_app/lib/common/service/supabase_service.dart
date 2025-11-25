@@ -113,7 +113,7 @@ class SupabaseService implements SupabaseServiceProtocol {
 
     if (file == null) return;
 
-    final newFilePath = await uploadImage(file: file, uid: user.id);
+    final newFilePath = await _uploadImage(file: file, uid: user.id);
 
     try {
       final data = await _supabase
@@ -122,16 +122,25 @@ class SupabaseService implements SupabaseServiceProtocol {
           .select()
           .single();
 
-      final result = ImageLabelResult.fromMap(data);
+      final fetchedResult = ImageLabelResult.fromMap(data);
 
-      print('created image label result with id ${result.id}');
+      await Future.wait(
+        result.predictions.map(
+          (prediction) => createPrediction(
+            resultId: fetchedResult.id,
+            labelId: prediction.label.id,
+            confidence: prediction.confidenceDecimal,
+          ),
+        ),
+      );
+
+      print('created image label result with id ${fetchedResult.id}');
     } catch (error) {
       print('error creatings image label result -> $error');
     }
   }
 
-  @override
-  Future<String?> uploadImage({required File file, required String uid}) async {
+  Future<String> _uploadImage({required File file, required String uid}) async {
     final fileName = const Uuid().v4();
     final filePath = '$uid/$fileName.png';
     final storage = _supabase.storage.from('images');
@@ -167,7 +176,10 @@ class SupabaseService implements SupabaseServiceProtocol {
     return emptyResult;
   }
 
-  Future<ImageLabelResult?> _getImageLabelResult({required String id}) async {
+  Future<ImageLabelResult?> _getImageLabelResult({
+    required String id,
+    required StorageFileApi storage,
+  }) async {
     if (!isAuthenticated) return null;
 
     try {
@@ -177,7 +189,6 @@ class SupabaseService implements SupabaseServiceProtocol {
           .eq('id', id)
           .single();
 
-      final storage = _supabase.storage.from('images');
       final emptyResult = ImageLabelResult.fromMap(data);
 
       return await _getCompleteImageLabelResult(
@@ -194,22 +205,19 @@ class SupabaseService implements SupabaseServiceProtocol {
   Future<List<ImageLabelResult>> getImageLabelResults() async {
     if (!isAuthenticated) return [];
 
+    final storage = _supabase.storage.from('images');
+
     try {
       final data = await _supabase.from('image_label_results').select();
-      final storage = _supabase.storage.from('images');
 
-      final results = await Future.wait(
+      final nullableResults = await Future.wait(
         data.map((item) async {
-          final emptyResult = ImageLabelResult.fromMap(item);
-
-          return await _getCompleteImageLabelResult(
-            emptyResult: emptyResult,
-            storage: storage,
-          );
+          final id = item['id'] as String;
+          return await _getImageLabelResult(id: id, storage: storage);
         }).toList(),
       );
 
-      return results;
+      return nullableResults.whereType<ImageLabelResult>().toList();
     } catch (error) {
       print('error getting image label results -> $error');
       return [];
@@ -220,25 +228,60 @@ class SupabaseService implements SupabaseServiceProtocol {
   Future<void> updateImageLabelResult({
     required String id,
     File? newFile,
+    List<Prediction>? newPredictions,
   }) async {
-    // if (!isAuthenticated) return;
+    if (!isAuthenticated) return;
 
-    // final current = await _supabase
-    //     .from('image_label_results')
-    //     .select()
-    //     .eq('id', id)
-    //     .single();
+    final user = _supabase.auth.currentUser;
 
-    // try {
-    //   await _supabase
-    //       .from('image_label_results')
-    //       .update({'file_path': filePath})
-    //       .eq('id', id);
+    if (user == null) return;
 
-    //   print('updated image label result with id $id');
-    // } catch (error) {
-    //   print('error upating image label result with id $id -> $error');
-    // }
+    try {
+      final storage = _supabase.storage.from('images');
+
+      final currentResult = await _getImageLabelResult(
+        id: id,
+        storage: storage,
+      );
+
+      if (currentResult == null) return;
+
+      String? newFilePath;
+
+      if (newFile != null) {
+        newFilePath = await _uploadImage(file: newFile, uid: user.id);
+      }
+
+      if (newFilePath != null) {
+        await _supabase
+            .from('image_label_results')
+            .update({'file_path': newFilePath})
+            .eq('id', id);
+
+        final currentFilePath = currentResult.filePath;
+        await _deleteImage(filePath: currentFilePath);
+
+        print('updated file path for image label result with id $id');
+      } else {
+        print(
+          'could not update file path for image result with id $id -> new file path is null',
+        );
+      }
+
+      if (newPredictions != null) {
+        final currentPredictions = currentResult.predictions;
+
+        await _updatePredictions(
+          resultId: id,
+          oldPredictions: currentPredictions,
+          newPredictions: newPredictions,
+        );
+      }
+
+      print('updated image label result with id $id');
+    } catch (error) {
+      print('error updating image label result with id $id -> $error');
+    }
   }
 
   @override
@@ -246,12 +289,25 @@ class SupabaseService implements SupabaseServiceProtocol {
     if (!isAuthenticated) return;
 
     try {
-      await _supabase.from('image_label_results').delete().eq('id', id);
+      final data = await _supabase
+          .from('image_label_results')
+          .delete()
+          .eq('id', id)
+          .select()
+          .single();
+
+      final result = ImageLabelResult.fromMap(data);
+      await _deleteImage(filePath: result.filePath);
 
       print('deleted image label result with id $id');
     } catch (error) {
       print('error deleting image label result with id $id -> $error');
     }
+  }
+
+  Future<void> _deleteImage({required String filePath}) async {
+    final storage = _supabase.storage.from('images');
+    await storage.remove([filePath]);
   }
 
   @override
@@ -271,10 +327,9 @@ class SupabaseService implements SupabaseServiceProtocol {
             'confidence': confidence,
           })
           .select()
-          .limit(1);
+          .single();
 
-      final item = data.first;
-      final prediction = Prediction.fromDBMap(item);
+      final prediction = Prediction.fromDBMap(data);
 
       print('created prediction with id ${prediction.id}');
     } catch (error) {
@@ -351,6 +406,36 @@ class SupabaseService implements SupabaseServiceProtocol {
       print('deleted prediction with id $id');
     } catch (error) {
       print('error updating prediction with id $id -> $error');
+    }
+  }
+
+  void _sortPredictions(List<Prediction> predictions) {
+    predictions.sort((a, b) => a.label.id.compareTo(b.label.id));
+  }
+
+  Future<void> _updatePredictions({
+    required String resultId,
+    required List<Prediction> oldPredictions,
+    required List<Prediction> newPredictions,
+  }) async {
+    if (newPredictions.isNotEmpty &&
+        newPredictions.length == oldPredictions.length) {
+      _sortPredictions(oldPredictions);
+      _sortPredictions(newPredictions);
+
+      await Future.wait(
+        List.generate(newPredictions.length, (index) {
+          final oldPrediction = oldPredictions[index];
+          final newPrediction = newPredictions[index];
+
+          return updatePrediction(
+            id: oldPrediction.id,
+            resultId: resultId,
+            labelId: oldPrediction.label.id,
+            confidence: newPrediction.confidenceDecimal,
+          );
+        }),
+      );
     }
   }
 }
