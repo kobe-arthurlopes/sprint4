@@ -35,26 +35,37 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-  Future<void> _didPressEnterButton({
+  Future<void> _didPressSignInButton({
     required BuildContext context,
-    required bool isAuthenticated,
+    required SignInMethod method,
     required String? errorMessage,
   }) async {
-    final isFormValid = (_formKey.currentState?.validate() ?? false);
-    
+    bool condition = false;
+
+    final email = method == SignInMethod.emailPassword ? _emailController.text : null;
+    final password = method == SignInMethod.emailPassword ? _passwordController.text : null;
+
     _viewModel.configureSignIn(
-      method: SignInMethod.emailPassword,
-      email: _emailController.text, // mocked.email@gmail.com
-      password: _passwordController.text // 1234
+      method: method,
+      email: email,
+      password: password,
     );
 
-    await _viewModel.login();
+    final isAuthenticated = await _viewModel.login();
 
-    final loginMessage = isAuthenticated && isFormValid
+    switch (method) {
+      case SignInMethod.emailPassword:
+        final isFormValid = (_formKey.currentState?.validate() ?? false);
+        condition = isAuthenticated && isFormValid;
+      default:
+        condition = isAuthenticated;
+    }
+
+    final loginMessage = condition
       ? 'Login realizado com sucesso!'
       : errorMessage ?? 'Ocorreu algum problema, tente novamente.';
 
-    final snackBarColor = isAuthenticated ? Colors.green : Colors.redAccent;
+    final snackBarColor = condition ? Colors.green : Colors.redAccent;
 
     if (!context.mounted) return;
 
@@ -65,7 +76,7 @@ class _LoginPageState extends State<LoginPage> {
       )
     );
 
-    if (isAuthenticated) context.go(HomePage.routeId);
+    if (condition) context.go(HomePage.routeId);
   }
 
   @override
@@ -223,9 +234,14 @@ class _LoginPageState extends State<LoginPage> {
                       // Entrar
                       ElevatedButton(
                         onPressed: () async {
-                          await _didPressEnterButton(
-                            context: context, 
-                            isAuthenticated: data.isAuthenticated, 
+                          print('Login com email e senha');
+
+                          // 'mocked.email@gmail.com'
+                          // 1234
+
+                          await _didPressSignInButton(
+                            context: context,
+                            method: SignInMethod.emailPassword, 
                             errorMessage: data.errorMessage,
                           );
                         },
@@ -278,8 +294,11 @@ class _LoginPageState extends State<LoginPage> {
                         isGoogle: true,
                         onPressed: () async {
                           print('Login com Google');
-                          _viewModel.configureSignIn(method: SignInMethod.google);
-                          await _viewModel.login();
+                          await _didPressSignInButton(
+                            context: context, 
+                            method: SignInMethod.google, 
+                            errorMessage: data.errorMessage,
+                          );
                         },
                       ),
                       SizedBox(height: 16),
@@ -289,8 +308,11 @@ class _LoginPageState extends State<LoginPage> {
                         isGoogle: false,
                         onPressed: () async {
                           print('Login com Apple');
-                          _viewModel.configureSignIn(method: SignInMethod.apple);
-                          await _viewModel.login();
+                          await _didPressSignInButton(
+                            context: context, 
+                            method: SignInMethod.apple, 
+                            errorMessage: data.errorMessage,
+                          );
                         },
                       ),
                       SizedBox(height: 32),
