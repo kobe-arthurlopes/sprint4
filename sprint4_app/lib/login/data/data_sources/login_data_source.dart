@@ -1,4 +1,4 @@
-import 'package:sprint4_app/common/service/sign_in/sign_in_method.dart';
+import 'package:sprint4_app/common/service/sign_in/sign_in_config.dart';
 import 'package:sprint4_app/common/service/supabase/supabase_service_protocol.dart';
 import 'package:sprint4_app/login/data/models/login_data.dart';
 
@@ -7,11 +7,11 @@ class LoginDataSource {
 
   LoginDataSource({required this.supabaseService});
 
-  Future<void> login({required String email, required String password}) async {
+  Future<void> login(SignInConfig config) async {
     supabaseService.authentication.configureSignIn(
-      method: SignInMethod.emailPassword,
-      email: email, // mocked.email@gmail.com
-      password: password, // 1234
+      method: config.method,
+      email: config.email,
+      password: config.password,
     );
 
     await supabaseService.authentication.run();

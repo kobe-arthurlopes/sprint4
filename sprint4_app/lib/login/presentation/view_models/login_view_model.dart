@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:sprint4_app/common/service/sign_in/sign_in_config.dart';
+import 'package:sprint4_app/common/service/sign_in/sign_in_method.dart';
 import 'package:sprint4_app/login/data/models/login_data.dart';
 import 'package:sprint4_app/login/data/repositories/login_repository.dart';
 
@@ -12,10 +14,7 @@ class LoginViewModel {
     data.value = data.value.copyWith(isLoading: true);
 
     try {
-      await repository.login(
-        email: data.value.email, 
-        password: data.value.password
-      );
+      await repository.login(config: data.value.signInConfig);
     } catch (error) {
       final errorMessage = 'Ocorreu um problema ($error). Tente novamente';
       data.value = data.value.copyWith(errorMessage: errorMessage);
@@ -23,6 +22,20 @@ class LoginViewModel {
 
     data.value = data.value.copyWith(isLoading: false);
     await repository.fetchData();
+  }
+
+  void configureSignIn({
+    required SignInMethod method,
+    String? email,
+    String? password,
+  }) {
+    final config = SignInConfig(
+      method: method,
+      email: email,
+      password: password,
+    );
+
+    data.value = data.value.copyWith(signInConfig: config);
   }
 
   void togglePasswordVisibility() {

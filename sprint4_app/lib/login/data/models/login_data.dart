@@ -1,17 +1,17 @@
+import 'package:sprint4_app/common/service/sign_in/sign_in_config.dart';
+
 class LoginData {
   bool isPasswordVisible;
   bool isLoading;
   bool isAuthenticated;
-  String email;
-  String password;
+  SignInConfig? signInConfig;
   String? errorMessage;
 
   LoginData({
     this.isPasswordVisible = false,
     this.isLoading = false,
     this.isAuthenticated = false,
-    this.email = '',
-    this.password = '',
+    this.signInConfig,
     this.errorMessage,
   });
 
@@ -19,16 +19,14 @@ class LoginData {
     bool? isPasswordVisible,
     bool? isLoading,
     bool? isAuthenticated,
-    String? email,
-    String? password,
+    SignInConfig? signInConfig,
     String? errorMessage,
   }) {
     return LoginData(
       isPasswordVisible: isPasswordVisible ?? this.isPasswordVisible,
       isLoading: isLoading ?? this.isLoading,
       isAuthenticated: isAuthenticated ?? this.isAuthenticated,
-      email: email ?? this.email,
-      password: password ?? this.password,
+      signInConfig: signInConfig ?? this.signInConfig,
       errorMessage: errorMessage ?? this.errorMessage,
     );
   }
