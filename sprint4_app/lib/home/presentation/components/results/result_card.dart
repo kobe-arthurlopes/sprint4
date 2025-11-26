@@ -55,7 +55,7 @@ class ResultCard extends StatelessWidget {
             
             // Labels
             Expanded(
-              flex: 2,
+              flex: 0,
               child: Padding(
                 padding: const EdgeInsets.all(12),
                 child: Column(

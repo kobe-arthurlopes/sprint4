@@ -82,13 +82,5 @@ class _ResultsGridState extends State<ResultsGrid> {
       ), 
     );
 
-    // Se tem callback de refresh, envolve com RefreshIndicator
-    // if (onRefresh != null) {
-    //   return RefreshIndicator(
-    //     onRefresh: () async => onRefresh!(),
-    //     color: Colors.blue,
-    //     child: gridView,
-    //   );
-    // }
   }
 }

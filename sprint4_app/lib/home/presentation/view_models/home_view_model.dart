@@ -19,12 +19,14 @@ class HomeViewModel extends ChangeNotifier {
   }
 
   Future<void> upateImageLabelResult(String filePath) async {
+    print('entrou no update image label result');
     currentResult = await ImageLabelingService.getLabeledImage(filePath);
     currentResult.filePath = filePath;
     notifyListeners();
   }
 
   Future<void> createData() async {
+    print('createdata');
     await repository.createResult(currentResult);
   }
 

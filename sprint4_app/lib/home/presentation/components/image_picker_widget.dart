@@ -142,7 +142,6 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
                     heroTag: 'fab_save',
                     onPressed: () async {
                       widget.onSave();
-                      // context.go('/list');
                     },
                     child: Icon(Icons.save),
                   ),

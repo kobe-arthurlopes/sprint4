@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sprint4_app/common/service/authentication/authentication_service_protocol.dart';
 import 'package:sprint4_app/common/service/supabase/supabase_service_protocol.dart';
@@ -8,7 +9,7 @@ import 'package:sprint4_app/common/models/prediction.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 
-class SupabaseService implements SupabaseServiceProtocol {
+class SupabaseService extends ChangeNotifier implements SupabaseServiceProtocol {
   late final SupabaseClient _supabase;
 
   @override
