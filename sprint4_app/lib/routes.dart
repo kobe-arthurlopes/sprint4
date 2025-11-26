@@ -11,7 +11,7 @@ class Routes {
     final SupabaseServiceProtocol supabaseService = context.read<SupabaseServiceProtocol>();
     String initialScreen = '/login';
 
-    if (supabaseService.authentication.isAuthenticated) {
+    if (supabaseService.authentication.hasExistingSession()) {
       initialScreen = HomePage.routeId;
     }
 
