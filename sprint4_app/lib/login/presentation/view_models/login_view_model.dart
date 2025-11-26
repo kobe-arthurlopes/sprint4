@@ -1,40 +1,32 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:sprint4_app/common/service/sign_in/sign_in_method.dart';
-import 'package:sprint4_app/common/service/supabase/supabase_service.dart';
-import 'package:sprint4_app/common/service/supabase/supabase_service_protocol.dart';
+import 'package:sprint4_app/login/data/models/login_data.dart';
+import 'package:sprint4_app/login/data/repositories/login_repository.dart';
 
-class LoginViewModel extends ChangeNotifier {
-  final formKey = GlobalKey<FormState>();
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
-  final SupabaseServiceProtocol supabaseService;
-  bool isPasswordVisible = false;
-  bool isLoading = false;
+class LoginViewModel {
+  final LoginRepository repository;
+  final ValueNotifier<LoginData> data = ValueNotifier(LoginData());
 
-  LoginViewModel({required this.supabaseService});
+  LoginViewModel({required this.repository});
 
-  Future<bool> handleLogin() async {
-    if (!formKey.currentState!.validate()) return false;
+  Future<void> login() async {
+    data.value = data.value.copyWith(isLoading: true);
 
-    isLoading = true;
-    notifyListeners();
-
-    final email = emailController.text;
-    final password = passwordController.text;
-
-    supabaseService.authentication.configureSignIn(
-      method: SignInMethod.emailPassword,
-      email: email, //'mocked.email@gmail.com'
-      password: password //1234
-    );
-
-    await supabaseService.authentication.run();
-    isLoading = false;
-    notifyListeners();
-    if (supabaseService.authentication.isAuthenticated) {
-      return true;
+    try {
+      await repository.login(
+        email: data.value.email, 
+        password: data.value.password
+      );
+    } catch (error) {
+      final errorMessage = 'Ocorreu um problema ($error). Tente novamente';
+      data.value = data.value.copyWith(errorMessage: errorMessage);
     }
-    return false;
+
+    data.value = data.value.copyWith(isLoading: false);
+    await repository.fetchData();
+  }
+
+  void togglePasswordVisibility() {
+    final isPasswordVisible = data.value.isPasswordVisible;
+    data.value = data.value.copyWith(isPasswordVisible: !isPasswordVisible);
   }
 }
