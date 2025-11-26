@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
+import 'package:sprint4_app/common/service/sign_in/sign_in_method.dart';
+import 'package:sprint4_app/home/presentation/pages/home_page.dart';
 import 'package:sprint4_app/login/data/models/login_data.dart';
 import 'package:sprint4_app/login/presentation/view_models/login_view_model.dart';
 
@@ -38,6 +41,13 @@ class _LoginPageState extends State<LoginPage> {
     required String? errorMessage,
   }) async {
     final isFormValid = (_formKey.currentState?.validate() ?? false);
+    
+    _viewModel.configureSignIn(
+      method: SignInMethod.emailPassword,
+      email: _emailController.text, // mocked.email@gmail.com
+      password: _passwordController.text // 1234
+    );
+
     await _viewModel.login();
 
     final loginMessage = isAuthenticated && isFormValid
@@ -55,7 +65,7 @@ class _LoginPageState extends State<LoginPage> {
       )
     );
 
-    if (isAuthenticated) context.go('/');
+    if (isAuthenticated) context.go(HomePage.routeId);
   }
 
   @override
@@ -265,8 +275,10 @@ class _LoginPageState extends State<LoginPage> {
 
                       // Login com Google
                       OutlinedButton.icon(
-                        onPressed: () {
+                        onPressed: () async {
                           print('Login com Google');
+                          _viewModel.configureSignIn(method: SignInMethod.google);
+                          await _viewModel.login();
                         },
                         style: OutlinedButton.styleFrom(
                           padding: EdgeInsets.symmetric(vertical: 16),
@@ -280,6 +292,15 @@ class _LoginPageState extends State<LoginPage> {
                           'Continuar com Google',
                           style: TextStyle(color: Colors.white, fontSize: 16),
                         ),
+                      ),
+                      SizedBox(height: 24),
+
+                      SignInWithAppleButton(
+                        onPressed: () async {
+                          print('Login com Apple');
+                          _viewModel.configureSignIn(method: SignInMethod.apple);
+                          await _viewModel.login();
+                        }
                       ),
                       SizedBox(height: 32),
 
