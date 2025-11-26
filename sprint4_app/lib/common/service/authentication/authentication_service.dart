@@ -35,6 +35,7 @@ class AuthenticationService implements AuthenticationServiceProtocol {
   bool hasExistingSession() {
     final existingSession = client?.currentSession;
     isAuthenticated = existingSession != null;
+    if (isAuthenticated) print('user already logged in');
     return isAuthenticated;
   }
 
@@ -74,17 +75,22 @@ class AuthenticationService implements AuthenticationServiceProtocol {
 
   @override
   Future<void> run() async {
+    if (hasExistingSession()) {
+      isAuthenticated = true;
+      return;
+    }
+
     try {
       final response = await getResponse();
 
       if (response.user != null && response.session != null) {
         isAuthenticated = true;
-        print("login succeeded — userId: ${response.user!.id}");
+        print('login succeeded — userId: ${response.user!.id}');
         return;
       }
 
       isAuthenticated = false;
-      print("login failed — userId: ${response.user?.id}");
+      print('login failed — userId: ${response.user?.id}');
     } catch (error) {
       print('error authenticating on Supabase -> $error');
     }
