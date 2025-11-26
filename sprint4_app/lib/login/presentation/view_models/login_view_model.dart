@@ -10,18 +10,20 @@ class LoginViewModel {
 
   LoginViewModel({required this.repository});
 
-  Future<void> login() async {
+  Future<bool> login() async {
     data.value = data.value.copyWith(isLoading: true);
 
+    bool isAuthenticated = false;
+
     try {
-      await repository.login(config: data.value.signInConfig);
+      isAuthenticated = await repository.login(config: data.value.signInConfig);
     } catch (error) {
       final errorMessage = 'Ocorreu um problema ($error). Tente novamente';
       data.value = data.value.copyWith(errorMessage: errorMessage);
     }
 
     data.value = data.value.copyWith(isLoading: false);
-    await repository.fetchData();
+    return isAuthenticated;
   }
 
   void configureSignIn({
