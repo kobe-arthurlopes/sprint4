@@ -26,7 +26,6 @@ class HomeViewModel extends ChangeNotifier {
   }
 
   Future<void> createData() async {
-    print('createdata');
     await repository.createResult(currentResult);
   }
 

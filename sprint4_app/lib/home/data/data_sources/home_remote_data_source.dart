@@ -12,7 +12,6 @@ class HomeRemoteDataSource extends ChangeNotifier {
   }
 
   Future<void> createResult(ImageLabelResult result) async {
-    print('home remote create result');
     await supabaseService.createImageLabelResult(result: result);
   }
 
