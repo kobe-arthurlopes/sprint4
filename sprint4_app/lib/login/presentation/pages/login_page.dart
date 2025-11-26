@@ -1,21 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import 'package:sprint4_app/login/data/models/login_data.dart';
 import 'package:sprint4_app/login/presentation/view_models/login_view_model.dart';
 
 class LoginPage extends StatefulWidget {
-  final LoginViewModel viewModel;
+  static const routeId = '/login'; 
 
-  const LoginPage({super.key, required this.viewModel});
+  const LoginPage({super.key});
 
   @override
   State<LoginPage> createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
+  late final LoginViewModel _viewModel;
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    super.initState();
+    _viewModel = context.read<LoginViewModel>();
+  }
 
   @override
   void dispose() {
@@ -30,7 +38,7 @@ class _LoginPageState extends State<LoginPage> {
     required String? errorMessage,
   }) async {
     final isFormValid = (_formKey.currentState?.validate() ?? false);
-    await widget.viewModel.login();
+    await _viewModel.login();
 
     final loginMessage = isAuthenticated && isFormValid
       ? 'Login realizado com sucesso!'
@@ -53,7 +61,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext content) {
     return ValueListenableBuilder<LoginData>(
-      valueListenable: widget.viewModel.data, 
+      valueListenable: _viewModel.data, 
       builder: (_, data, _) {
         return Scaffold(
           backgroundColor: Colors.black,
@@ -150,7 +158,7 @@ class _LoginPageState extends State<LoginPage> {
                               data.isPasswordVisible ? Icons.visibility : Icons.visibility_off,
                               color: Colors.grey[400],
                             ),
-                            onPressed: widget.viewModel.togglePasswordVisibility,
+                            onPressed: _viewModel.togglePasswordVisibility,
                           ),
                           filled: true,
                           fillColor: Color(0xFF1E1E1E),
