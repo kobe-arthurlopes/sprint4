@@ -64,7 +64,7 @@ class _DraggableBottomSheetState extends State<DraggableBottomSheet>
   void _handleDragEnd(DragEndDetails details) {
     setState(() => _isDragging = false);
 
-    final threshold = 5.0; 
+    final threshold = 5.0;
     final primaryVelocity = details.primaryVelocity;
 
     if (primaryVelocity == null) return;

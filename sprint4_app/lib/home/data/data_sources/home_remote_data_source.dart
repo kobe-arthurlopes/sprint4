@@ -1,7 +1,8 @@
+import 'package:flutter/material.dart';
 import 'package:sprint4_app/common/models/image_label_result.dart';
 import 'package:sprint4_app/common/service/supabase/supabase_service_protocol.dart';
 
-class HomeRemoteDataSource {
+class HomeRemoteDataSource extends ChangeNotifier {
   final SupabaseServiceProtocol supabaseService;
 
   HomeRemoteDataSource({required this.supabaseService});
