@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:sprint4_app/common/login/view_models/login_view_model.dart';
+import 'package:sprint4_app/login/presentation/view_models/login_view_model.dart';
 
 class LoginPage extends StatefulWidget {
   final LoginViewModel viewModel;
-  const LoginPage({Key? key, required this.viewModel}) : super(key: key);
+
+  const LoginPage({super.key, required this.viewModel});
+
   @override
   State<LoginPage> createState() => _LoginPageState();
 }

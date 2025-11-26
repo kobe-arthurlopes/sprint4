@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:sprint4_app/common/login/view_models/login_view_model.dart';
+import 'package:sprint4_app/login/presentation/view_models/login_view_model.dart';
 import 'package:sprint4_app/common/service/authentication/authentication_service.dart';
 import 'package:sprint4_app/common/service/authentication/authentication_service_protocol.dart';
 import 'package:sprint4_app/common/service/sign_in/sign_in_method.dart';

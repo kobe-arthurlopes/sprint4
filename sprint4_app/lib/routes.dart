@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:sprint4_app/common/login/presentation/pages/login_page.dart';
 import 'package:sprint4_app/common/service/supabase/supabase_service_protocol.dart';
 import 'package:sprint4_app/home/presentation/pages/home_page.dart';
+import 'package:sprint4_app/login/presentation/pages/login_page.dart';
 
 // Configuração do GoRouter
 GoRouter router(BuildContext context) {
