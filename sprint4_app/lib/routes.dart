@@ -19,13 +19,13 @@ class Routes {
       initialLocation: initialScreen,
       routes: [
         GoRoute(
+          path: LoginPage.routeId,
+          builder: (_, _) => LoginPage()
+        ),
+        GoRoute(
           path: HomePage.routeId,
           builder: (_, _) => HomePage()   
         ),
-        GoRoute(
-          path: LoginPage.routeId,
-          builder: (_, _) => LoginPage()
-        )
       ]
     );
   }
