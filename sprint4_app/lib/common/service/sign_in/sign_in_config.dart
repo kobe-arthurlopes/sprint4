@@ -6,7 +6,7 @@ class SignInConfig {
   final String? password;
 
   const SignInConfig({
-    this.method = SignInMethod.emailPassword,
+    this.method = SignInMethod.email,
     this.email,
     this.password,
   });

@@ -15,7 +15,7 @@ class AuthenticationService implements AuthenticationServiceProtocol {
   bool isAuthenticated = false;
 
   @override
-  SignInMethod signInMethod = SignInMethod.emailPassword;
+  SignInMethod signInMethod = SignInMethod.email;
 
   @override
   String email = '';
@@ -24,7 +24,11 @@ class AuthenticationService implements AuthenticationServiceProtocol {
   String password = '';
 
   @override
-  void configureSignIn({required SignInMethod method, String? email, String? password}) {
+  void configureSignIn({
+    required SignInMethod method,
+    String? email,
+    String? password,
+  }) {
     signInMethod = method;
 
     if (email != null) this.email = email;
@@ -42,9 +46,7 @@ class AuthenticationService implements AuthenticationServiceProtocol {
   @override
   Future<AuthResponse> getResponse() async {
     if (client == null) {
-      throw const AuthException(
-        'Client Auth invalid to get auth response',
-      );
+      throw const AuthException('Client Auth invalid to get auth response');
     }
 
     final signInService = signInMethod.signInService();
@@ -52,10 +54,7 @@ class AuthenticationService implements AuthenticationServiceProtocol {
     final rawNonce = client!.generateRawNonce();
 
     if (signInService == null || oAuthProvider == null) {
-      return await client!.signInWithPassword(
-        email: email,
-        password: password,
-      );
+      return await client!.signInWithPassword(email: email, password: password);
     }
 
     final idToken = await signInService.getIdToken(rawNonce: rawNonce);
