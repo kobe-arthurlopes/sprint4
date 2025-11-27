@@ -8,7 +8,7 @@ import 'package:sprint4_app/login/presentation/components/sign_in_button.dart';
 import 'package:sprint4_app/login/presentation/view_models/login_view_model.dart';
 
 class LoginPage extends StatefulWidget {
-  static const routeId = '/login'; 
+  static const routeId = '/login';
 
   const LoginPage({super.key});
 
@@ -42,8 +42,10 @@ class _LoginPageState extends State<LoginPage> {
   }) async {
     bool condition = false;
 
-    final email = method == SignInMethod.emailPassword ? _emailController.text : null;
-    final password = method == SignInMethod.emailPassword ? _passwordController.text : null;
+    final email = method == SignInMethod.email ? _emailController.text : null;
+    final password = method == SignInMethod.email
+        ? _passwordController.text
+        : null;
 
     _viewModel.configureSignIn(
       method: method,
@@ -54,7 +56,7 @@ class _LoginPageState extends State<LoginPage> {
     final isAuthenticated = await _viewModel.login();
 
     switch (method) {
-      case SignInMethod.emailPassword:
+      case SignInMethod.email:
         final isFormValid = (_formKey.currentState?.validate() ?? false);
         condition = isAuthenticated && isFormValid;
       default:
@@ -62,18 +64,15 @@ class _LoginPageState extends State<LoginPage> {
     }
 
     final loginMessage = condition
-      ? 'Login realizado com sucesso!'
-      : errorMessage ?? 'Ocorreu algum problema, tente novamente.';
+        ? 'Login realizado com sucesso!'
+        : errorMessage ?? 'Ocorreu algum problema, tente novamente.';
 
     final snackBarColor = condition ? Colors.green : Colors.redAccent;
 
     if (!context.mounted) return;
 
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(loginMessage),
-        backgroundColor: snackBarColor,
-      )
+      SnackBar(content: Text(loginMessage), backgroundColor: snackBarColor),
     );
 
     if (condition) context.go(HomePage.routeId);
@@ -82,7 +81,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext content) {
     return ValueListenableBuilder<LoginData>(
-      valueListenable: _viewModel.data, 
+      valueListenable: _viewModel.data,
       builder: (_, data, _) {
         return Scaffold(
           backgroundColor: Colors.black,
@@ -97,13 +96,9 @@ class _LoginPageState extends State<LoginPage> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       // Logo ou Título
-                      Icon(
-                        Icons.lock_outline,
-                        size: 80,
-                        color: Colors.blue,
-                      ),
+                      Icon(Icons.lock_outline, size: 80, color: Colors.blue),
                       SizedBox(height: 24),
-                      
+
                       Text(
                         'Bem-vindo!',
                         style: TextStyle(
@@ -114,13 +109,10 @@ class _LoginPageState extends State<LoginPage> {
                         textAlign: TextAlign.center,
                       ),
                       SizedBox(height: 8),
-                      
+
                       Text(
                         'Insira suas credenciais para continuar',
-                        style: TextStyle(
-                          color: Colors.grey[400],
-                          fontSize: 16,
-                        ),
+                        style: TextStyle(color: Colors.grey[400], fontSize: 16),
                         textAlign: TextAlign.center,
                       ),
                       SizedBox(height: 48),
@@ -133,7 +125,10 @@ class _LoginPageState extends State<LoginPage> {
                         decoration: InputDecoration(
                           labelText: 'Email',
                           labelStyle: TextStyle(color: Colors.grey[400]),
-                          prefixIcon: Icon(Icons.email_outlined, color: Colors.grey[400]),
+                          prefixIcon: Icon(
+                            Icons.email_outlined,
+                            color: Colors.grey[400],
+                          ),
                           filled: true,
                           fillColor: Color(0xFF1E1E1E),
                           border: OutlineInputBorder(
@@ -142,11 +137,17 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: Colors.grey[800]!, width: 1),
+                            borderSide: BorderSide(
+                              color: Colors.grey[800]!,
+                              width: 1,
+                            ),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: Colors.blue, width: 2),
+                            borderSide: BorderSide(
+                              color: Colors.blue,
+                              width: 2,
+                            ),
                           ),
                           errorBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -157,7 +158,9 @@ class _LoginPageState extends State<LoginPage> {
                           if (value == null || value.isEmpty) {
                             return 'Por favor, insira seu email';
                           }
-                          if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                          if (!RegExp(
+                            r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                          ).hasMatch(value)) {
                             return 'Por favor, insira um email válido';
                           }
                           return null;
@@ -173,10 +176,15 @@ class _LoginPageState extends State<LoginPage> {
                         decoration: InputDecoration(
                           labelText: 'Senha',
                           labelStyle: TextStyle(color: Colors.grey[400]),
-                          prefixIcon: Icon(Icons.lock_outline, color: Colors.grey[400]),
+                          prefixIcon: Icon(
+                            Icons.lock_outline,
+                            color: Colors.grey[400],
+                          ),
                           suffixIcon: IconButton(
                             icon: Icon(
-                              data.isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                              data.isPasswordVisible
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
                               color: Colors.grey[400],
                             ),
                             onPressed: _viewModel.togglePasswordVisibility,
@@ -189,11 +197,17 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: Colors.grey[800]!, width: 1),
+                            borderSide: BorderSide(
+                              color: Colors.grey[800]!,
+                              width: 1,
+                            ),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: Colors.blue, width: 2),
+                            borderSide: BorderSide(
+                              color: Colors.blue,
+                              width: 2,
+                            ),
                           ),
                           errorBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -222,17 +236,15 @@ class _LoginPageState extends State<LoginPage> {
                           },
                           child: Text(
                             'Esqueceu a senha?',
-                            style: TextStyle(
-                              color: Colors.blue,
-                              fontSize: 14,
-                            ),
+                            style: TextStyle(color: Colors.blue, fontSize: 14),
                           ),
                         ),
                       ),
                       SizedBox(height: 24),
 
-                      // Entrar
-                      ElevatedButton(
+                      // Login com email
+                      SignInButton(
+                        method: SignInMethod.email, 
                         onPressed: () async {
                           print('Login com email e senha');
 
@@ -241,35 +253,11 @@ class _LoginPageState extends State<LoginPage> {
 
                           await _didPressSignInButton(
                             context: context,
-                            method: SignInMethod.emailPassword, 
+                            method: SignInMethod.email,
                             errorMessage: data.errorMessage,
                           );
                         },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue,
-                          padding: EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          elevation: 0,
-                        ),
-                        child: data.isLoading
-                            ? SizedBox(
-                                height: 20,
-                                width: 20,
-                                child: CircularProgressIndicator(
-                                  color: Colors.white,
-                                  strokeWidth: 2,
-                                ),
-                              )
-                            : Text(
-                                'Entrar',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
+                        isLoading: data.isLoading,
                       ),
                       SizedBox(height: 24),
 
@@ -291,12 +279,12 @@ class _LoginPageState extends State<LoginPage> {
 
                       // Login com Google
                       SignInButton(
-                        isGoogle: true,
+                        method: SignInMethod.google,
                         onPressed: () async {
                           print('Login com Google');
                           await _didPressSignInButton(
-                            context: context, 
-                            method: SignInMethod.google, 
+                            context: context,
+                            method: SignInMethod.google,
                             errorMessage: data.errorMessage,
                           );
                         },
@@ -305,12 +293,12 @@ class _LoginPageState extends State<LoginPage> {
 
                       // Login com Apple
                       SignInButton(
-                        isGoogle: false,
+                        method: SignInMethod.apple,
                         onPressed: () async {
                           print('Login com Apple');
                           await _didPressSignInButton(
-                            context: context, 
-                            method: SignInMethod.apple, 
+                            context: context,
+                            method: SignInMethod.apple,
                             errorMessage: data.errorMessage,
                           );
                         },
@@ -347,7 +335,7 @@ class _LoginPageState extends State<LoginPage> {
             ),
           ),
         );
-      }
+      },
     );
   }
 }
