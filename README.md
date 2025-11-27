@@ -20,6 +20,8 @@ do <a href="https://developers.google.com/ml-kit" target="_blank">Google ML Kit<
   <details>
     <summary>Ver código</summary>
 
+	<br>
+
     ```swift  
     private func labelImage(withBytes bytes: FlutterStandardTypedData? = nil, result: @escaping FlutterResult) {
       guard let bytes, let uiImage = UIImage(data: bytes.data) else {
@@ -70,6 +72,8 @@ do <a href="https://developers.google.com/ml-kit" target="_blank">Google ML Kit<
       }
     }
     ```
+
+    <br>
     
   </details>
   
@@ -86,6 +90,8 @@ do <a href="https://developers.google.com/ml-kit" target="_blank">Google ML Kit<
 
   <details>
     <summary>Ver código</summary>
+
+	<br>
 
     ```kotlin
     private fun labelImage(bytes: ByteArray, result: MethodChannel.Result) {
@@ -125,6 +131,9 @@ do <a href="https://developers.google.com/ml-kit" target="_blank">Google ML Kit<
       }
     }
     ```
+
+    <br>
+	
   </details>
   
 
@@ -163,72 +172,216 @@ do <a href="https://developers.google.com/ml-kit" target="_blank">Google ML Kit<
 
 **Serviços em Nuvem**
 
-- Para armazenamento das imagens classificadas pelo Google ML Kit, o app utiliza o ``Supabase`` como 0 serviço em nuvem que armazena seu banco de dados.
-- Todas as tabelas, ativação de Row-Level Security, policies e configuração de storage foi usado a seção ``SQL Editor`` do Supabase. As tabelas criadas foram:
+- Para armazenamento das imagens classificadas pelo Google ML Kit, o app utiliza o ``Supabase`` como o ``serviço em nuvem`` que armazena seu banco de dados
+- Em toda criação de tabelas e policies, ativação de RLS e configuração de storage foi usada a seção ``SQL Editor`` do Supabase. Foram 3 objetos criados: ``Label``, ``ImageLabelResult`` e ``Prediction``
 
-  ```sql
-  -- Criação da tabela para o objeto Label
-  -- Label representa as 446 categorias disponibilizadas pelo ML Kit para o Image Labeling
-  create table public.labels(
-    id integer primary key,
-    text text unique not null
-  );
+- ``Label`` representa uma das 446 categorias disponibilizadas pelo ML Kit para o Image Labeling
+  <details>
+	<summary>SQL</summary>
 
-  -- Aciona RLS (Row-Level Security) para a tabela 'labels'
-  alter table public.labels enable row level security;
+	<br>
+  	<p>
+		- Criação da tabela 'labels':
+	</p>
 
-  -- Depois de ativar o RLS, cria-se policies que indicam regras para o acesso da tabela 'labels'
-  -- Essa policy permite que qualquer pessoa possa ler os dados dessa tabela
-  create policy "Anyone can read labels"
+	```sql
+	create table public.labels(
+	id integer primary key,
+	text text unique not null
+	);
+	```
+	<br>
+	<p>
+		- Ativação do RLS:
+	</p>
+
+ 	```sql
+  	alter table public.labels enable row level security;
+  	```
+
+  	<br>
+	<p>
+		- Policies:
+	</p>
+
+  	```sql
+    -- Permite que qualquer usuário possa ler os dados dessa tabela
+	create policy "Anyone can read labels"
 	on public.labels
 	for select
 	using (true);
-  ```
+   	```
+ 
+  </details>
 
-  ```sql
-  -- Criação da tabela para o objeto ImageLabelResult
-  -- ImageLabelResult representa o resultado de uma imagem classificada pelo ML Kit
-  -- o método gen_random_uuid() sempre gera um UUID aleatório para a propriedade id
-  -- a propriedade user_id aponta para auth.users(id), que guarda o id dos usuários logados
-  -- 'on delete cascade' significa que se um user for removido, seus ImageLabelResults também serão
-  -- file_path é o caminho para a imagem classificada
-  
-  create table public.image_label_results(
-  	id uuid primary key default gen_random_uuid(),
-  	user_id uuid not null references auth.users(id) on delete cascade, 
-  	file_path text not null
-  );
+- ``ImageLabelResult`` representa o resultado de uma imagem classificada pelo ML Kit
+  <details>	
+	<summary>SQL</summary>
 
-  -- Aciona RLS para a tabela 'image_label_results'
-  alter table public.image_label_results enable row level security;
+	<br>
+	<p>
+		- Criação da tabela 'image_label_results':
+	</p>
+	  
+	```sql
+	-- Método gen_random_uuid() sempre gera um UUID aleatório para a propriedade id
+	-- A propriedade user_id aponta para auth.users(id), que guarda o id dos usuários logados
+	-- 'on delete cascade' significa que se um user for removido, os ImageLabelResults relacionados a ele também serão
+	-- file_path é o caminho para a imagem classificada
+	create table public.image_label_results(
+	id uuid primary key default gen_random_uuid(),
+	user_id uuid not null references auth.users(id) on delete cascade, 
+	file_path text not null
+	);
+ 	```
 
-  -- Criação das policies da tabela:
+	<br>
+	<p>
+		- Ativação do RLS:
+	</p>
+	
+ 	```sql
+	alter table public.image_label_results enable row level security;
+ 	```
 
-  -- Usuários poderão ler todas as ImageLabelResults que tiverem user_id
-  -- igual ao seu id de usário
-  create policy “Users can read their own results”
+	<br>
+	<p>
+		- Policies:
+	</p>
+
+	```sql
+	-- Usuários poderão ler todas as ImageLabelResults que tiverem user_id
+	-- igual ao seu id de usário
+	create policy “Users can read their own results”
 	on public.image_label_results
 	for select
 	using (auth.uid() = user_id);
+	
+	-- Usuários poderão criar uma ImageLabelResult com user_id
+	-- obrigatoriamente igual ao seu id de usuário
+	create policy “Users can create their own results”
+	on public.image_label_results
+	for insert
+	with check (auth.uid() = user_id);
+	
+	-- Usuários poderão atualizar uma ImageLabelResult com user_id
+	-- obrigatoriamente igual ao seu id de usuário e sem poderem alterar essa propriedade
+	create policy “Users can update their own results”
+	on public.image_label_results
+	for update
+	using (auth.uid() = user_id)
+	with check (auth.uid() = user_id);
 
-  -- Usuários poderão criar ImageLabelResults que tenham user_id
-  -- igual ao seu id de usuário
-  create policy “Users can create their own results”
-  on public.image_label_results
-  for insert
-  with check (auth.uid() = user_id);
+ 	-- Usuários poderão deletar uma ImageLabelResult com user_id
+	-- obrigatoriamente igual ao seu id de usuário
+	create policy “Users can delete their own results”
+	on public.image_label_results
+	for delete
+	using (auth.uid() = user_id);
+	```
+ 
+  </details>
 
-  -- Usuários poderão atualizar ImageLabelResults que tiverem
-  -- user_id igual ao seu id de usuário
-  create policy “Users can update their own results”
-  on public.image_label_results
-  for update
-  using (auth.uid() = user_id)
-  with check (auth.uid() = user_id);
+- ``Prediction`` representa uma previsão do ML Kit sobre uma imagem, sendo uma junção entre uma Label e uma porcentagem de confiança
+  <details>
+	<summary>SQL</summary>
+
+	<br>
+	<p>
+		- Criação da tabela 'predictions':
+	</p>
+
+	```sql
+ 	-- Está necessariamente ligada a uma Label e a um ImageLabelResult
+ 	create table public.predictions(
+	id uuid primary key default gen_random_uuid(),
+	result_id uuid not null references public.image_label_results(id) on delete cascade,
+	label_id integer not null references public.labels(id) on delete cascade,
+	confidence decimal(10,2) not null
+	);
+ 	```
+
+	<br>
+	<p>
+		- Ativação do RLS':
+	</p>
+	
   
-  create policy “Users can delete their own results”
-  on public.image_label_results
-  for delete
-  using (auth.uid() = user_id);
-  ```
+ 	```sql
+ 	alter table public.predictions enable row level security;
+ 	```
+
+	<br>
+	<p>
+		- Policies:
+	</p>
+
+	```sql
+ 	-- Usuários poderão ler todas as Predictions que tiverem user_id
+	-- igual ao seu id de usário
+ 	create policy “Users can read their own predictions”
+	on public.predictions
+	for select
+	using (
+ 		exists(
+  			select 1
+  			from public.image_label_results result
+  			where result.id = result_id
+  			and result.user_id = auth.uid()
+ 		)
+	);
+
+ 	-- Usuários poderão criar uma Prediction com user_id
+	-- obrigatoriamente igual ao seu id de usuário
+	create policy “Users can create their own predictions”
+		on public.predictions
+		for insert
+		with check (
+	 		exists(
+	  			select 1
+	  			from public.image_label_results result
+	  			where result.id = result_id
+	  			and result.user_id = auth.uid()
+	 		)
+		);
+
+ 	-- Usuários poderão atualizar uma Prediction com user_id
+	-- obrigatoriamente igual ao seu id de usuário e sem poderem alterar essa propriedade
+	create policy “Users can update their own predictions”
+		on public.predictions
+		for update
+		using (
+	 		exists(
+	 			select 1
+	  			from public.image_label_results result
+	  			where result.id = result_id
+	 			and result.user_id = auth.uid()
+	 		)
+		)
+		with check (
+	 		exists(
+	  			select 1
+	  			from public.image_label_results result
+	  			where result.id = result_id
+	  			and result.user_id = auth.uid()
+	 		)
+		);
+
+ 	-- Usuários poderão deletar uma Prediction com user_id
+	-- obrigatoriamente igual ao seu id de usuário
+	create policy “Users can delete their own predictions”
+		on public.predictions
+		for delete
+		using (
+	 		exists(
+	  			select 1
+	  			from public.image_label_results result
+	  			where result.id = result_id
+	  			and result.user_id = auth.uid()
+	 		)
+		);
+ 	
+ 	```
+
+  </details>
 
