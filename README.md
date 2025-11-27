@@ -385,3 +385,8 @@ do <a href="https://developers.google.com/ml-kit" target="_blank">Google ML Kit<
 
   </details>
 
+- Autenticação: para que o usuário se autentique ao Supabase e tenha acesso ao seu banco de dados foram usados 3 métodos: ``Apple``, ``Google`` e ``Email``
+
+- ``Apple``: 
+
+
