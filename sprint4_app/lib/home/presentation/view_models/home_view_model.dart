@@ -1,56 +1,45 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:sprint4_app/common/models/image_label_result.dart';
 import 'package:sprint4_app/common/service/channels/image_labeling_service.dart';
+import 'package:sprint4_app/home/data/models/home_data.dart';
 import 'package:sprint4_app/home/data/repositories/home_repository.dart';
 
-class HomeViewModel extends ChangeNotifier {
+class HomeViewModel {
   final HomeRepository repository;
+  final ValueNotifier<HomeData> data = ValueNotifier(HomeData());
 
   HomeViewModel({required this.repository});
 
-  ImageLabelResult currentResult = ImageLabelResult();
-  bool isLoading = false;
-  List<ImageLabelResult> results = [];
-  bool shouldShowBottomSheet = true;
-
   Future<void> fetch() async {
-    results = await repository.fetchData();
-    notifyListeners();
+    final homeData = await repository.fetchData();
+    data.value = homeData;
   }
 
   Future<void> upateImageLabelResult(String filePath) async {
-    currentResult = await ImageLabelingService.getLabeledImage(filePath);
+    final currentResult = await ImageLabelingService.getLabeledImage(filePath);
     currentResult.filePath = filePath;
-    notifyListeners();
+    data.value = data.value.copyWith(currentResult: currentResult);
   }
 
   Future<void> createData() async {
+    final currentResult = data.value.currentResult;
+    if (currentResult == null) return;
     await repository.createResult(currentResult);
   }
 
   Future<void> refreshResults() async {
-    _startLoading();
+    data.value = data.value.copyWith(isLoading: true);
     await fetch();
-    _stopLoading();
-  }
-
-  void _startLoading() {
-    isLoading = true;
-    notifyListeners();
-  }
-
-  void _stopLoading() {
-    isLoading = false;
-    notifyListeners();
+    data.value = data.value.copyWith(isLoading: false);
   }
 
   void resetCurrentResult() {
-    currentResult = ImageLabelResult();
-    notifyListeners();
+    final currentResult = ImageLabelResult();
+    data.value = data.value.copyWith(currentResult: currentResult);
   }
 
   void updateShouldShowBottomSheet({required bool value}) {
-    shouldShowBottomSheet = value;
-    notifyListeners();
+    final shouldShowBottomSheet = value;
+    data.value = data.value.copyWith(shouldShowBottomSheet: shouldShowBottomSheet);
   }
 }

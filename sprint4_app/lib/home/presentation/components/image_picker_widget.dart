@@ -10,14 +10,14 @@ class ImagePickerWidget extends StatefulWidget {
   final void Function() onSave;
   final void Function() onClose;
 
-  const ImagePickerWidget({
+  ImagePickerWidget({
     super.key,
-    required this.imageLabelResult,
+    ImageLabelResult? imageLabelResult,
     required this.shouldLabelFile,
     required this.onToggleBottomSheet,
     required this.onSave,
     required this.onClose,
-  });
+  }) : imageLabelResult = imageLabelResult ?? ImageLabelResult();
 
   @override
   State<StatefulWidget> createState() => _ImagePickerWidgetState();
@@ -37,11 +37,13 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
   }
 
   List<Widget> _getLabeledImagesWidget() {
-    if (widget.imageLabelResult.predictions.isEmpty) return [];
+    final result = widget.imageLabelResult;
+
+    if (result.predictions.isEmpty) return [];
 
     List<Widget> all = [];
 
-    for (var prediction in widget.imageLabelResult.predictions) {
+    for (var prediction in result.predictions) {
       all.add(
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -142,7 +144,6 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
                     heroTag: 'fab_save',
                     onPressed: () async {
                       widget.onSave();
-                      // context.go('/list');
                     },
                     child: Icon(Icons.save),
                   ),

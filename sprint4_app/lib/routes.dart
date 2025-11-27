@@ -1,33 +1,32 @@
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:sprint4_app/home/data/repositories/home_repository.dart';
+import 'package:provider/provider.dart';
+import 'package:sprint4_app/common/service/supabase/supabase_service_protocol.dart';
 import 'package:sprint4_app/home/presentation/pages/home_page.dart';
-import 'package:sprint4_app/home/presentation/view_models/home_view_model.dart';
+import 'package:sprint4_app/login/presentation/pages/login_page.dart';
 
-// Configuração do GoRouter
-GoRouter router(HomeRepository homeRepo) {
-  return GoRouter(
-    initialLocation: '/',
-    routes: [
-      GoRoute(
-        path: '/',
-        builder: (context, state) {
-          final viewModel = HomeViewModel(repository: homeRepo);
-          return HomePage(viewModel: viewModel);
-        }
-      ),
+class Routes {
+  // Configuração do GoRouter
+  GoRouter config(BuildContext context) {
+    final SupabaseServiceProtocol supabaseService = context.read<SupabaseServiceProtocol>();
+    String initialScreen = '/login';
 
-      // GoRoute(
-      //   path: '/list',
-      //   builder: (context, state) {
-      //     final viewModel = context.read<HomeViewModel>();
+    if (supabaseService.authentication.hasExistingSession()) {
+      initialScreen = HomePage.routeId;
+    }
 
-      //     return ResultsGrid(
-      //       results: viewModel.results, 
-      //       isLoading: viewModel.isLoading,
-      //       onRefresh: viewModel.refreshResults,
-      //     );
-      //   }
-      // )
-    ]
-  );
+    return GoRouter(
+      initialLocation: initialScreen,
+      routes: [
+        GoRoute(
+          path: LoginPage.routeId,
+          builder: (_, _) => LoginPage()
+        ),
+        GoRoute(
+          path: HomePage.routeId,
+          builder: (_, _) => HomePage()   
+        ),
+      ]
+    );
+  }
 }

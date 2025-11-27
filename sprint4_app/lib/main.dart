@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:sprint4_app/dependencies.dart';
+import 'package:sprint4_app/dependencies_injector.dart';
 import 'package:sprint4_app/routes.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await injectDependencies();
+  final depenciesInjector = DependenciesInjector();
+  await depenciesInjector.inject();
 }
 
 class MyApp extends StatelessWidget {
@@ -13,6 +13,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(routerConfig: router(context.read()));
+    final routes = Routes();
+    return MaterialApp.router(routerConfig: routes.config(context));
   }
 }
