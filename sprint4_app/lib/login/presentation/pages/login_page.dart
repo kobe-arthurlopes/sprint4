@@ -5,6 +5,7 @@ import 'package:sprint4_app/common/service/sign_in/sign_in_method.dart';
 import 'package:sprint4_app/home/presentation/pages/home_page.dart';
 import 'package:sprint4_app/login/data/models/login_data.dart';
 import 'package:sprint4_app/login/presentation/components/sign_in_button.dart';
+import 'package:sprint4_app/login/presentation/components/login_text_field.dart';
 import 'package:sprint4_app/login/presentation/view_models/login_view_model.dart';
 
 class LoginPage extends StatefulWidget {
@@ -118,127 +119,20 @@ class _LoginPageState extends State<LoginPage> {
                       SizedBox(height: 48),
 
                       // Campo de Email
-                      TextFormField(
+                      LoginTextField(
+                        type: LoginTextFieldOption.email,
                         controller: _emailController,
-                        keyboardType: TextInputType.emailAddress,
-                        style: TextStyle(color: Colors.white),
-                        decoration: InputDecoration(
-                          labelText: 'Email',
-                          labelStyle: TextStyle(color: Colors.grey[400]),
-                          prefixIcon: Icon(
-                            Icons.email_outlined,
-                            color: Colors.grey[400],
-                          ),
-                          filled: true,
-                          fillColor: Color(0xFF1E1E1E),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide.none,
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(
-                              color: Colors.grey[800]!,
-                              width: 1,
-                            ),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(
-                              color: Colors.blue,
-                              width: 2,
-                            ),
-                          ),
-                          errorBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: Colors.red, width: 1),
-                          ),
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Por favor, insira seu email';
-                          }
-                          if (!RegExp(
-                            r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
-                          ).hasMatch(value)) {
-                            return 'Por favor, insira um email válido';
-                          }
-                          return null;
-                        },
+                        validator: _viewModel.validateEmail,
                       ),
                       SizedBox(height: 16),
 
                       // Campo de Senha
-                      TextFormField(
+                      LoginTextField(
+                        type: LoginTextFieldOption.password,
                         controller: _passwordController,
-                        obscureText: !data.isPasswordVisible,
-                        style: TextStyle(color: Colors.white),
-                        decoration: InputDecoration(
-                          labelText: 'Senha',
-                          labelStyle: TextStyle(color: Colors.grey[400]),
-                          prefixIcon: Icon(
-                            Icons.lock_outline,
-                            color: Colors.grey[400],
-                          ),
-                          suffixIcon: IconButton(
-                            icon: Icon(
-                              data.isPasswordVisible
-                                  ? Icons.visibility
-                                  : Icons.visibility_off,
-                              color: Colors.grey[400],
-                            ),
-                            onPressed: _viewModel.togglePasswordVisibility,
-                          ),
-                          filled: true,
-                          fillColor: Color(0xFF1E1E1E),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide.none,
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(
-                              color: Colors.grey[800]!,
-                              width: 1,
-                            ),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(
-                              color: Colors.blue,
-                              width: 2,
-                            ),
-                          ),
-                          errorBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: Colors.red, width: 1),
-                          ),
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Por favor, insira sua senha';
-                          }
-                          if (value.length < 4) {
-                            return 'A senha deve ter pelo menos 4 caracteres';
-                          }
-                          return null;
-                        },
-                      ),
-                      SizedBox(height: 8),
-
-                      // Esqueci a senha
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: TextButton(
-                          onPressed: () {
-                            // Navegar para tela de recuperação de senha
-                            print('Esqueceu a senha');
-                          },
-                          child: Text(
-                            'Esqueceu a senha?',
-                            style: TextStyle(color: Colors.blue, fontSize: 14),
-                          ),
-                        ),
+                        isVisible: data.isPasswordVisible,
+                        onPressedSuffixIcon: _viewModel.togglePasswordVisibility,
+                        validator: _viewModel.validatePassword,
                       ),
                       SizedBox(height: 24),
 
@@ -304,30 +198,6 @@ class _LoginPageState extends State<LoginPage> {
                         },
                       ),
                       SizedBox(height: 32),
-
-                      // Link para Cadastro
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            'Não tem uma conta? ',
-                            style: TextStyle(color: Colors.grey[400]),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              // Navegar para tela de cadastro
-                              print('Ir para cadastro');
-                            },
-                            child: Text(
-                              'Cadastre-se',
-                              style: TextStyle(
-                                color: Colors.blue,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
                     ],
                   ),
                 ),
