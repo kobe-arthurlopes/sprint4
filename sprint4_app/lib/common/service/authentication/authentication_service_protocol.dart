@@ -1,4 +1,4 @@
-import 'package:sprint4_app/common/service/sign_in/sign_in_method.dart';
+import 'package:sprint4_app/common/service/authentication/login_method.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 abstract class AuthenticationServiceProtocol {
@@ -8,13 +8,20 @@ abstract class AuthenticationServiceProtocol {
 
   bool get isAuthenticated;
 
-  SignInMethod get signInMethod;
+  bool get isSignIn;
+  LoginMethod get loginMethod;
   String get email;
   String get password;
 
-  void configureSignIn({required SignInMethod method, String? email, String? password});
+  void configureLogin({
+    required bool isSignIn,
+    required LoginMethod method,
+    String? email,
+    String? password,
+  });
 
   bool hasExistingSession();
-  Future<AuthResponse> getResponse();
+  Future<AuthResponse?> getSignInResponse();
+  Future<AuthResponse?> getSignUpResponse();
   Future<void> run();
 }

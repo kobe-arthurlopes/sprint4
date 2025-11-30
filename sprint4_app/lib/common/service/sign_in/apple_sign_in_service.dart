@@ -18,10 +18,10 @@ class AppleSignInService implements SignInProtocol {
       ],
       nonce: hashedNonce,
       webAuthenticationOptions: WebAuthenticationOptions(
-        clientId: 'com.example.sprint4App.auth', 
+        clientId: 'com.example.sprint4App.auth',
         redirectUri: Uri.parse(
-          'https://xrelnsmrfjvyiamzpsbp.supabase.co/auth/v1/callback'
-        )
+          'https://xrelnsmrfjvyiamzpsbp.supabase.co/auth/v1/callback',
+        ),
       ),
     );
 

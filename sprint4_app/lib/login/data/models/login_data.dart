@@ -1,30 +1,42 @@
-import 'package:sprint4_app/common/service/sign_in/sign_in_config.dart';
+import 'package:sprint4_app/common/service/authentication/login_method.dart';
 
 class LoginData {
   bool isPasswordVisible;
   bool isLoading;
-  SignInConfig? signInConfig;
+  LoginMethod method;
+  String? email;
+  String? password;
   String? errorMessage;
+  bool isSignIn;
 
   LoginData({
     this.isPasswordVisible = false,
     this.isLoading = false,
-    this.signInConfig,
+    this.method = LoginMethod.email,
+    this.email,
+    this.password,
     this.errorMessage,
+    this.isSignIn = true,
   });
 
   LoginData copyWith({
     bool? isPasswordVisible,
     bool? isLoading,
     bool? isAuthenticated,
-    SignInConfig? signInConfig,
+    LoginMethod? method,
+    String? email,
+    String? password,
     String? errorMessage,
+    bool? isSignIn,
   }) {
     return LoginData(
       isPasswordVisible: isPasswordVisible ?? this.isPasswordVisible,
       isLoading: isLoading ?? this.isLoading,
-      signInConfig: signInConfig ?? this.signInConfig,
+      method: method ?? this.method,
+      email: email ?? this.email,
+      password: password ?? this.password,
       errorMessage: errorMessage ?? this.errorMessage,
+      isSignIn: isSignIn ?? this.isSignIn,
     );
   }
 }

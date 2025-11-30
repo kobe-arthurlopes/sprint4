@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:sprint4_app/common/service/sign_in/sign_in_method.dart';
+import 'package:sprint4_app/common/service/authentication/login_method.dart';
 import 'package:sprint4_app/home/presentation/pages/home_page.dart';
 import 'package:sprint4_app/login/data/models/login_data.dart';
-import 'package:sprint4_app/login/presentation/components/sign_in_button.dart';
+import 'package:sprint4_app/login/presentation/components/login_button.dart';
 import 'package:sprint4_app/login/presentation/components/login_text_field.dart';
 import 'package:sprint4_app/login/presentation/view_models/login_view_model.dart';
 
@@ -27,6 +27,20 @@ class _LoginPageState extends State<LoginPage> {
   void initState() {
     super.initState();
     _viewModel = context.read<LoginViewModel>();
+    _setListeners();
+  }
+
+  void _setListeners() {
+    _emailController.addListener(() {
+      _viewModel.setEmail(_emailController.text);
+    });
+
+    _passwordController.addListener(() {
+      _viewModel.setPassword(_passwordController.text);
+    });
+
+    // 'mocked.email@gmail.com'
+    // 1234
   }
 
   @override
@@ -38,37 +52,18 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> _didPressSignInButton({
     required BuildContext context,
-    required SignInMethod method,
     required String? errorMessage,
+    bool? isFormValid,
   }) async {
-    bool condition = false;
-
-    final email = method == SignInMethod.email ? _emailController.text : null;
-    final password = method == SignInMethod.email
-        ? _passwordController.text
-        : null;
-
-    _viewModel.configureSignIn(
-      method: method,
-      email: email,
-      password: password,
+    final isLoginValid = await _viewModel.isLoginValid(
+      isFormValid: isFormValid,
     );
 
-    final isAuthenticated = await _viewModel.login();
-
-    switch (method) {
-      case SignInMethod.email:
-        final isFormValid = (_formKey.currentState?.validate() ?? false);
-        condition = isAuthenticated && isFormValid;
-      default:
-        condition = isAuthenticated;
-    }
-
-    final loginMessage = condition
+    final loginMessage = isLoginValid
         ? 'Login realizado com sucesso!'
         : errorMessage ?? 'Ocorreu algum problema, tente novamente.';
 
-    final snackBarColor = condition ? Colors.green : Colors.redAccent;
+    final snackBarColor = isLoginValid ? Colors.green : Colors.redAccent;
 
     if (!context.mounted) return;
 
@@ -76,7 +71,16 @@ class _LoginPageState extends State<LoginPage> {
       SnackBar(content: Text(loginMessage), backgroundColor: snackBarColor),
     );
 
-    if (condition) context.go(HomePage.routeId);
+    if (isLoginValid) context.go(HomePage.routeId);
+  }
+
+  void _resetFields() {
+    _emailController.text = '';
+    _passwordController.text = '';
+
+    if (_viewModel.data.value.isPasswordVisible) {
+      _viewModel.togglePasswordVisibility();
+    }
   }
 
   @override
@@ -101,7 +105,7 @@ class _LoginPageState extends State<LoginPage> {
                       SizedBox(height: 24),
 
                       Text(
-                        'Bem-vindo!',
+                        data.isSignIn ? 'Bem-vindo!' : 'Cadastro',
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 32,
@@ -112,7 +116,9 @@ class _LoginPageState extends State<LoginPage> {
                       SizedBox(height: 8),
 
                       Text(
-                        'Insira suas credenciais para continuar',
+                        data.isSignIn
+                            ? 'Insira suas credenciais para continuar'
+                            : 'Insira suas informações para cadastro',
                         style: TextStyle(color: Colors.grey[400], fontSize: 16),
                         textAlign: TextAlign.center,
                       ),
@@ -131,73 +137,106 @@ class _LoginPageState extends State<LoginPage> {
                         type: LoginTextFieldOption.password,
                         controller: _passwordController,
                         isVisible: data.isPasswordVisible,
-                        onPressedSuffixIcon: _viewModel.togglePasswordVisibility,
+                        onPressedSuffixIcon:
+                            _viewModel.togglePasswordVisibility,
                         validator: _viewModel.validatePassword,
                       ),
                       SizedBox(height: 24),
 
                       // Login com email
-                      SignInButton(
-                        method: SignInMethod.email, 
+                      LoginButton(
+                        method: LoginMethod.email,
                         onPressed: () async {
                           print('Login com email e senha');
+                          _viewModel.setMethod(LoginMethod.email);
 
-                          // 'mocked.email@gmail.com'
-                          // 1234
+                          final isFormValid = _formKey.currentState?.validate();
 
                           await _didPressSignInButton(
                             context: context,
-                            method: SignInMethod.email,
                             errorMessage: data.errorMessage,
+                            isFormValid: isFormValid,
                           );
                         },
                         isLoading: data.isLoading,
                       ),
                       SizedBox(height: 24),
 
-                      // Divisor
+                      if (data.isSignIn) ...[
+                        // Divisor
+                        Row(
+                          children: [
+                            Expanded(child: Divider(color: Colors.grey[800])),
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 16),
+                              child: Text(
+                                'OU',
+                                style: TextStyle(color: Colors.grey[600]),
+                              ),
+                            ),
+                            Expanded(child: Divider(color: Colors.grey[800])),
+                          ],
+                        ),
+                        SizedBox(height: 24),
+
+                        // Login com Google
+                        LoginButton(
+                          method: LoginMethod.google,
+                          onPressed: () async {
+                            print('Login com Google');
+
+                            _viewModel.setMethod(LoginMethod.google);
+
+                            await _didPressSignInButton(
+                              context: context,
+                              errorMessage: data.errorMessage,
+                            );
+                          },
+                        ),
+                        SizedBox(height: 16),
+
+                        // Login com Apple
+                        LoginButton(
+                          method: LoginMethod.apple,
+                          onPressed: () async {
+                            print('Login com Apple');
+
+                            _viewModel.setMethod(LoginMethod.apple);
+
+                            await _didPressSignInButton(
+                              context: context,
+                              errorMessage: data.errorMessage,
+                            );
+                          },
+                        ),
+                        SizedBox(height: 32),
+                      ],
+
+                      // Link para Cadastro
                       Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Expanded(child: Divider(color: Colors.grey[800])),
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 16),
+                          Text(
+                            data.isSignIn
+                                ? 'Não tem uma conta? '
+                                : 'Deseja se logar? ',
+                            style: TextStyle(color: Colors.grey[400]),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              _viewModel.toggleIsSignIn();
+                              _resetFields();
+                            },
                             child: Text(
-                              'OU',
-                              style: TextStyle(color: Colors.grey[600]),
+                              data.isSignIn ? 'Cadastre-se' : 'Voltar',
+                              style: TextStyle(
+                                color: Colors.blue,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
-                          Expanded(child: Divider(color: Colors.grey[800])),
                         ],
                       ),
-                      SizedBox(height: 24),
-
-                      // Login com Google
-                      SignInButton(
-                        method: SignInMethod.google,
-                        onPressed: () async {
-                          print('Login com Google');
-                          await _didPressSignInButton(
-                            context: context,
-                            method: SignInMethod.google,
-                            errorMessage: data.errorMessage,
-                          );
-                        },
-                      ),
-                      SizedBox(height: 16),
-
-                      // Login com Apple
-                      SignInButton(
-                        method: SignInMethod.apple,
-                        onPressed: () async {
-                          print('Login com Apple');
-                          await _didPressSignInButton(
-                            context: context,
-                            method: SignInMethod.apple,
-                            errorMessage: data.errorMessage,
-                          );
-                        },
-                      ),
-                      SizedBox(height: 32),
                     ],
                   ),
                 ),
