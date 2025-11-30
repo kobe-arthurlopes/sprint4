@@ -18,7 +18,6 @@ class _DraggableBottomSheetState extends State<DraggableBottomSheet>
   final double _maxHeight = 800;
   double _currentHeight = 120;
   bool _isExpanded = false;
-  bool _isDragging = false;
   
   late AnimationController _controller;
 
@@ -50,10 +49,6 @@ class _DraggableBottomSheetState extends State<DraggableBottomSheet>
     });
   }
 
-  void _handleDragStart() {
-    setState(() => _isDragging = true);
-  }
-
   void _handleDragUpdate(DragUpdateDetails details) {
     setState(() {
       _currentHeight -= details.delta.dy;
@@ -62,8 +57,6 @@ class _DraggableBottomSheetState extends State<DraggableBottomSheet>
   }
 
   void _handleDragEnd(DragEndDetails details) {
-    setState(() => _isDragging = false);
-
     final threshold = 5.0;
     final primaryVelocity = details.primaryVelocity;
 
@@ -99,7 +92,6 @@ class _DraggableBottomSheetState extends State<DraggableBottomSheet>
       right: 0,
       bottom: 0,
       child: GestureDetector(
-        onVerticalDragStart: (_) => _handleDragStart(),
         onVerticalDragUpdate: _handleDragUpdate,
         onVerticalDragEnd: _handleDragEnd,
         child: Container(
