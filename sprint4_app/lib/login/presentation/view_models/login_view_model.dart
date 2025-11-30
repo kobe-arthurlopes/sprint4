@@ -44,4 +44,30 @@ class LoginViewModel {
     final isPasswordVisible = data.value.isPasswordVisible;
     data.value = data.value.copyWith(isPasswordVisible: !isPasswordVisible);
   }
+
+  String? validatePassword(String? password) {
+    if (password == null || password.isEmpty) {
+      return 'Por favor, insira sua senha';
+    }
+
+    if (password.length < 4) {
+      return 'A senha deve ter pelo menos 4 caracteres';
+    }
+
+    return null;
+  }
+
+  String? validateEmail(String? email) {
+    if (email == null || email.isEmpty) {
+      return 'Por favor, insira seu email';
+    }
+
+    if (!RegExp(
+      r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+    ).hasMatch(email)) {
+      return 'Por favor, insira um email válido';
+    }
+
+    return null;
+  }
 }
