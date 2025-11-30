@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sprint4_app/common/models/image_label_result.dart';
 import 'package:sprint4_app/home/presentation/components/pulsing_button.dart';
+import 'package:sprint4_app/home/presentation/components/save_dialog.dart';
 
 class ImagePickerWidget extends StatefulWidget {
   final ImageLabelResult imageLabelResult;
   final void Function(String) shouldLabelFile;
   final void Function(bool) onToggleBottomSheet;
-  final void Function() onSave;
+  final Future<void> Function() onSave;
   final void Function() onClose;
 
   ImagePickerWidget({
@@ -26,7 +27,6 @@ class ImagePickerWidget extends StatefulWidget {
 class _ImagePickerWidgetState extends State<ImagePickerWidget> {
   final _picker = ImagePicker();
   ImageSource _imageSource = ImageSource.camera;
-  final bool isLoading = false;
 
   _pickImage() async {
     final pickedImage = await _picker.pickImage(source: _imageSource);
@@ -76,6 +76,10 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
     }
 
     return all;
+  }
+
+  void _showSavingDialog(BuildContext context) {
+    showDialog(context: context, builder: (context) => SaveDialog());
   }
 
   @override
@@ -200,7 +204,12 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
                     foregroundColor: Colors.black,
                     heroTag: 'fab_save',
                     onPressed: () async {
-                      widget.onSave();
+                      _showSavingDialog(context);
+                      await widget.onSave();
+
+                      if (!context.mounted) return;
+
+                      Navigator.pop(context);
                     },
                     child: Icon(Icons.save),
                   ),
