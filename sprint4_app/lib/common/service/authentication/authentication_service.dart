@@ -15,7 +15,7 @@ class AuthenticationService implements AuthenticationServiceProtocol {
   bool isAuthenticated = false;
 
   @override
-  SignInMethod signInMethod = SignInMethod.emailPassword;
+  SignInMethod signInMethod = SignInMethod.email;
 
   @override
   String email = '';
@@ -24,7 +24,11 @@ class AuthenticationService implements AuthenticationServiceProtocol {
   String password = '';
 
   @override
-  void configureSignIn({required SignInMethod method, String? email, String? password}) {
+  void configureSignIn({
+    required SignInMethod method,
+    String? email,
+    String? password,
+  }) {
     signInMethod = method;
 
     if (email != null) this.email = email;
@@ -35,15 +39,14 @@ class AuthenticationService implements AuthenticationServiceProtocol {
   bool hasExistingSession() {
     final existingSession = client?.currentSession;
     isAuthenticated = existingSession != null;
+    if (isAuthenticated) print('user already logged in');
     return isAuthenticated;
   }
 
   @override
   Future<AuthResponse> getResponse() async {
     if (client == null) {
-      throw const AuthException(
-        'Client Auth invalid to get auth response',
-      );
+      throw const AuthException('Client Auth invalid to get auth response');
     }
 
     final signInService = signInMethod.signInService();
@@ -51,10 +54,7 @@ class AuthenticationService implements AuthenticationServiceProtocol {
     final rawNonce = client!.generateRawNonce();
 
     if (signInService == null || oAuthProvider == null) {
-      return await client!.signInWithPassword(
-        email: email,
-        password: password,
-      );
+      return await client!.signInWithPassword(email: email, password: password);
     }
 
     final idToken = await signInService.getIdToken(rawNonce: rawNonce);
@@ -74,17 +74,22 @@ class AuthenticationService implements AuthenticationServiceProtocol {
 
   @override
   Future<void> run() async {
+    if (hasExistingSession()) {
+      isAuthenticated = true;
+      return;
+    }
+
     try {
       final response = await getResponse();
 
       if (response.user != null && response.session != null) {
         isAuthenticated = true;
-        print("login succeeded — userId: ${response.user!.id}");
+        print('login succeeded — userId: ${response.user!.id}');
         return;
       }
 
       isAuthenticated = false;
-      print("login failed — userId: ${response.user?.id}");
+      print('login failed — userId: ${response.user?.id}');
     } catch (error) {
       print('error authenticating on Supabase -> $error');
     }

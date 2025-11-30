@@ -36,7 +36,7 @@ class ImageLabelingService {
 
   static Future<List<Label>> fetchLabelsFromJson() async {
     try {
-      final jsonString = await rootBundle.loadString('lib/labels.json');
+      final jsonString = await rootBundle.loadString('lib/common/models/labels.json');
       final data = json.decode(jsonString);
       final maps = (data as List).cast<Map<String, dynamic>>();
       return maps.map((element) => Label.fromMap(element)).toList();

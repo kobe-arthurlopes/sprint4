@@ -1,11 +1,10 @@
 import 'dart:io';
-import 'package:flutter/material.dart';
 import 'package:sprint4_app/common/models/image_label_result.dart';
 import 'package:sprint4_app/common/models/label.dart';
 import 'package:sprint4_app/common/models/prediction.dart';
 import 'package:sprint4_app/common/service/authentication/authentication_service_protocol.dart';
 
-abstract class SupabaseServiceProtocol implements ChangeNotifier {
+abstract class SupabaseServiceProtocol {
   AuthenticationServiceProtocol get authentication;
 
   Future<List<Label>> getLabels();

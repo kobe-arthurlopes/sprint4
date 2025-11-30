@@ -1,50 +1,104 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:sprint4_app/common/login/view_models/login_view_model.dart';
+import 'package:sprint4_app/common/service/sign_in/sign_in_method.dart';
+import 'package:sprint4_app/home/presentation/pages/home_page.dart';
+import 'package:sprint4_app/login/data/models/login_data.dart';
+import 'package:sprint4_app/login/presentation/components/sign_in_button.dart';
+import 'package:sprint4_app/login/presentation/view_models/login_view_model.dart';
 
 class LoginPage extends StatefulWidget {
-  final LoginViewModel viewModel;
-  const LoginPage({Key? key, required this.viewModel}) : super(key: key);
+  static const routeId = '/login';
+
+  const LoginPage({super.key});
+
   @override
   State<LoginPage> createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
+  late final LoginViewModel _viewModel;
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
 
   @override
-  void dispose() {
-    widget.viewModel.emailController.dispose();
-    widget.viewModel.passwordController.dispose();
-    super.dispose();
+  void initState() {
+    super.initState();
+    _viewModel = context.read<LoginViewModel>();
   }
 
   @override
-  Widget build(BuildContext context) {
-    return ChangeNotifierProvider.value(
-      value: widget.viewModel,
-      child: Consumer<LoginViewModel>(
-        builder: (context, viewModel, child) {
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _didPressSignInButton({
+    required BuildContext context,
+    required SignInMethod method,
+    required String? errorMessage,
+  }) async {
+    bool condition = false;
+
+    final email = method == SignInMethod.email ? _emailController.text : null;
+    final password = method == SignInMethod.email
+        ? _passwordController.text
+        : null;
+
+    _viewModel.configureSignIn(
+      method: method,
+      email: email,
+      password: password,
+    );
+
+    final isAuthenticated = await _viewModel.login();
+
+    switch (method) {
+      case SignInMethod.email:
+        final isFormValid = (_formKey.currentState?.validate() ?? false);
+        condition = isAuthenticated && isFormValid;
+      default:
+        condition = isAuthenticated;
+    }
+
+    final loginMessage = condition
+        ? 'Login realizado com sucesso!'
+        : errorMessage ?? 'Ocorreu algum problema, tente novamente.';
+
+    final snackBarColor = condition ? Colors.green : Colors.redAccent;
+
+    if (!context.mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(loginMessage), backgroundColor: snackBarColor),
+    );
+
+    if (condition) context.go(HomePage.routeId);
+  }
+
+  @override
+  Widget build(BuildContext content) {
+    return ValueListenableBuilder<LoginData>(
+      valueListenable: _viewModel.data,
+      builder: (_, data, _) {
         return Scaffold(
           backgroundColor: Colors.black,
           body: SafeArea(
             child: Center(
               child: SingleChildScrollView(
-                padding: EdgeInsets.symmetric(horizontal: 24),
+                padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: Form(
-                  key: widget.viewModel.formKey,
+                  key: _formKey,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       // Logo ou Título
-                      Icon(
-                        Icons.lock_outline,
-                        size: 80,
-                        color: Colors.blue,
-                      ),
+                      Icon(Icons.lock_outline, size: 80, color: Colors.blue),
                       SizedBox(height: 24),
-                      
+
                       Text(
                         'Bem-vindo!',
                         style: TextStyle(
@@ -55,26 +109,26 @@ class _LoginPageState extends State<LoginPage> {
                         textAlign: TextAlign.center,
                       ),
                       SizedBox(height: 8),
-                      
+
                       Text(
                         'Insira suas credenciais para continuar',
-                        style: TextStyle(
-                          color: Colors.grey[400],
-                          fontSize: 16,
-                        ),
+                        style: TextStyle(color: Colors.grey[400], fontSize: 16),
                         textAlign: TextAlign.center,
                       ),
                       SizedBox(height: 48),
-                      
+
                       // Campo de Email
                       TextFormField(
-                        controller: widget.viewModel.emailController,
+                        controller: _emailController,
                         keyboardType: TextInputType.emailAddress,
                         style: TextStyle(color: Colors.white),
                         decoration: InputDecoration(
                           labelText: 'Email',
                           labelStyle: TextStyle(color: Colors.grey[400]),
-                          prefixIcon: Icon(Icons.email_outlined, color: Colors.grey[400]),
+                          prefixIcon: Icon(
+                            Icons.email_outlined,
+                            color: Colors.grey[400],
+                          ),
                           filled: true,
                           fillColor: Color(0xFF1E1E1E),
                           border: OutlineInputBorder(
@@ -83,11 +137,17 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: Colors.grey[800]!, width: 1),
+                            borderSide: BorderSide(
+                              color: Colors.grey[800]!,
+                              width: 1,
+                            ),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: Colors.blue, width: 2),
+                            borderSide: BorderSide(
+                              color: Colors.blue,
+                              width: 2,
+                            ),
                           ),
                           errorBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -98,33 +158,36 @@ class _LoginPageState extends State<LoginPage> {
                           if (value == null || value.isEmpty) {
                             return 'Por favor, insira seu email';
                           }
-                          if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                          if (!RegExp(
+                            r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                          ).hasMatch(value)) {
                             return 'Por favor, insira um email válido';
                           }
                           return null;
                         },
                       ),
                       SizedBox(height: 16),
-                      
+
                       // Campo de Senha
                       TextFormField(
-                        controller: widget.viewModel.passwordController,
-                        obscureText: !widget.viewModel.isPasswordVisible,
+                        controller: _passwordController,
+                        obscureText: !data.isPasswordVisible,
                         style: TextStyle(color: Colors.white),
                         decoration: InputDecoration(
                           labelText: 'Senha',
                           labelStyle: TextStyle(color: Colors.grey[400]),
-                          prefixIcon: Icon(Icons.lock_outline, color: Colors.grey[400]),
+                          prefixIcon: Icon(
+                            Icons.lock_outline,
+                            color: Colors.grey[400],
+                          ),
                           suffixIcon: IconButton(
                             icon: Icon(
-                              widget.viewModel.isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                              data.isPasswordVisible
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
                               color: Colors.grey[400],
                             ),
-                            onPressed: () {
-                              setState(() {
-                                widget.viewModel.isPasswordVisible = !widget.viewModel.isPasswordVisible;
-                              });
-                            },
+                            onPressed: _viewModel.togglePasswordVisibility,
                           ),
                           filled: true,
                           fillColor: Color(0xFF1E1E1E),
@@ -134,11 +197,17 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: Colors.grey[800]!, width: 1),
+                            borderSide: BorderSide(
+                              color: Colors.grey[800]!,
+                              width: 1,
+                            ),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: Colors.blue, width: 2),
+                            borderSide: BorderSide(
+                              color: Colors.blue,
+                              width: 2,
+                            ),
                           ),
                           errorBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -156,7 +225,7 @@ class _LoginPageState extends State<LoginPage> {
                         },
                       ),
                       SizedBox(height: 8),
-                      
+
                       // Esqueci a senha
                       Align(
                         alignment: Alignment.centerRight,
@@ -167,61 +236,31 @@ class _LoginPageState extends State<LoginPage> {
                           },
                           child: Text(
                             'Esqueceu a senha?',
-                            style: TextStyle(
-                              color: Colors.blue,
-                              fontSize: 14,
-                            ),
+                            style: TextStyle(color: Colors.blue, fontSize: 14),
                           ),
                         ),
                       ),
                       SizedBox(height: 24),
-                      ElevatedButton(
+
+                      // Login com email
+                      SignInButton(
+                        method: SignInMethod.email, 
                         onPressed: () async {
-                          final logged = widget.viewModel.isLoading ? null : await widget.viewModel.handleLogin();
-                          if (logged == true) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text('Login realizado com sucesso!'),
-                                  backgroundColor: Colors.green,
-                                ),
-                              );
-                              context.go('/');
-                          }
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Ocorreu algum problema, tente novamente.'),
-                              backgroundColor: Colors.redAccent,
-                            ),
+                          print('Login com email e senha');
+
+                          // 'mocked.email@gmail.com'
+                          // 1234
+
+                          await _didPressSignInButton(
+                            context: context,
+                            method: SignInMethod.email,
+                            errorMessage: data.errorMessage,
                           );
                         },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue,
-                          padding: EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          elevation: 0,
-                        ),
-                        child: widget.viewModel.isLoading
-                            ? SizedBox(
-                                height: 20,
-                                width: 20,
-                                child: CircularProgressIndicator(
-                                  color: Colors.white,
-                                  strokeWidth: 2,
-                                ),
-                              )
-                            : Text(
-                                'Entrar',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
+                        isLoading: data.isLoading,
                       ),
                       SizedBox(height: 24),
-                      
+
                       // Divisor
                       Row(
                         children: [
@@ -237,27 +276,35 @@ class _LoginPageState extends State<LoginPage> {
                         ],
                       ),
                       SizedBox(height: 24),
-                      
+
                       // Login com Google
-                      OutlinedButton.icon(
-                        onPressed: () {
+                      SignInButton(
+                        method: SignInMethod.google,
+                        onPressed: () async {
                           print('Login com Google');
+                          await _didPressSignInButton(
+                            context: context,
+                            method: SignInMethod.google,
+                            errorMessage: data.errorMessage,
+                          );
                         },
-                        style: OutlinedButton.styleFrom(
-                          padding: EdgeInsets.symmetric(vertical: 16),
-                          side: BorderSide(color: Colors.grey[800]!),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        icon: Icon(Icons.g_mobiledata, color: Colors.white, size: 24),
-                        label: Text(
-                          'Continuar com Google',
-                          style: TextStyle(color: Colors.white, fontSize: 16),
-                        ),
+                      ),
+                      SizedBox(height: 16),
+
+                      // Login com Apple
+                      SignInButton(
+                        method: SignInMethod.apple,
+                        onPressed: () async {
+                          print('Login com Apple');
+                          await _didPressSignInButton(
+                            context: context,
+                            method: SignInMethod.apple,
+                            errorMessage: data.errorMessage,
+                          );
+                        },
                       ),
                       SizedBox(height: 32),
-                      
+
                       // Link para Cadastro
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -288,7 +335,7 @@ class _LoginPageState extends State<LoginPage> {
             ),
           ),
         );
-      })
+      },
     );
   }
 }
