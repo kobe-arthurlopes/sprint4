@@ -255,29 +255,29 @@ do <a href="https://developers.google.com/ml-kit" target="_blank">Google ML Kit<
 	create policy “Users can read their own results”
 	on public.image_label_results
 	for select
-	using (auth.uid() = user_id);
+	using ((select auth.uid()) = user_id);
 	
 	-- Usuários poderão criar uma ImageLabelResult com user_id
 	-- obrigatoriamente igual ao seu id de usuário
 	create policy “Users can create their own results”
 	on public.image_label_results
 	for insert
-	with check (auth.uid() = user_id);
+	with check ((select auth.uid()) = user_id);
 	
 	-- Usuários poderão atualizar uma ImageLabelResult com user_id
 	-- obrigatoriamente igual ao seu id de usuário e sem poderem alterar essa propriedade
 	create policy “Users can update their own results”
 	on public.image_label_results
 	for update
-	using (auth.uid() = user_id)
-	with check (auth.uid() = user_id);
+	using ((select auth.uid()) = user_id)
+	with check ((select auth.uid()) = user_id);
 
  	-- Usuários poderão deletar uma ImageLabelResult com user_id
 	-- obrigatoriamente igual ao seu id de usuário
 	create policy “Users can delete their own results”
 	on public.image_label_results
 	for delete
-	using (auth.uid() = user_id);
+	using ((select auth.uid()) = user_id);
 	```
  
   </details>
@@ -327,7 +327,7 @@ do <a href="https://developers.google.com/ml-kit" target="_blank">Google ML Kit<
   			select 1
   			from public.image_label_results result
   			where result.id = result_id
-  			and result.user_id = auth.uid()
+  			and result.user_id = (select auth.uid())
  		)
 	);
 
@@ -341,7 +341,7 @@ do <a href="https://developers.google.com/ml-kit" target="_blank">Google ML Kit<
 	  			select 1
 	  			from public.image_label_results result
 	  			where result.id = result_id
-	  			and result.user_id = auth.uid()
+	  			and result.user_id = (select auth.uid())
 	 		)
 		);
 
@@ -355,7 +355,7 @@ do <a href="https://developers.google.com/ml-kit" target="_blank">Google ML Kit<
 	 			select 1
 	  			from public.image_label_results result
 	  			where result.id = result_id
-	 			and result.user_id = auth.uid()
+	 			and result.user_id = (select auth.uid())
 	 		)
 		)
 		with check (
@@ -363,7 +363,7 @@ do <a href="https://developers.google.com/ml-kit" target="_blank">Google ML Kit<
 	  			select 1
 	  			from public.image_label_results result
 	  			where result.id = result_id
-	  			and result.user_id = auth.uid()
+	  			and result.user_id = (select auth.uid())
 	 		)
 		);
 
@@ -377,7 +377,7 @@ do <a href="https://developers.google.com/ml-kit" target="_blank">Google ML Kit<
 	  			select 1
 	  			from public.image_label_results result
 	  			where result.id = result_id
-	  			and result.user_id = auth.uid()
+	  			and result.user_id = (select auth.uid())
 	 		)
 		);
  	
