@@ -14,11 +14,12 @@ class SaveDialog extends StatelessWidget {
         padding: const EdgeInsets.all(24),
         child: Row(
           mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             CircularProgressIndicator(),
-
+        
             SizedBox(width: 16),
-
+        
             Text(
               'Saving...',
               style: TextStyle(
