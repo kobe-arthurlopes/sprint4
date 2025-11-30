@@ -26,14 +26,17 @@ class ImagePickerWidget extends StatefulWidget {
 class _ImagePickerWidgetState extends State<ImagePickerWidget> {
   final _picker = ImagePicker();
   ImageSource _imageSource = ImageSource.camera;
+  final bool isLoading = false;
 
   _pickImage() async {
     final pickedImage = await _picker.pickImage(source: _imageSource);
 
-    if (pickedImage != null) {
-      widget.shouldLabelFile(pickedImage.path);
-      setState(() {});
+    if (pickedImage == null) {
+      widget.onToggleBottomSheet(true);
+      return;
     }
+
+    widget.shouldLabelFile(pickedImage.path);
   }
 
   List<Widget> _getLabeledImagesWidget() {
@@ -50,12 +53,20 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
           children: [
             Text(
               prediction.label.text,
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
             ),
 
             Text(
               prediction.confidenceText,
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.normal),
+              style: TextStyle(
+                color: Colors.white60,
+                fontSize: 14,
+                fontWeight: FontWeight.normal,
+              ),
             ),
           ],
         ),
@@ -70,48 +81,88 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Toque o botão')),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-        child: widget.imageLabelResult.file == null
-            ? PulsingButton(
-                onTap: () {
-                  widget.onToggleBottomSheet(false);
-                  _pickImage();
-                },
-              )
-            : SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Spacer(),
+      backgroundColor: Color(0xFF121212),
+      body: Stack(
+        children: [
+          widget.imageLabelResult.file == null
+              ? Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: PulsingButton(
+                    onTap: () {
+                      widget.onToggleBottomSheet(false);
+                      _pickImage();
+                    },
+                  ),
+                )
+              : SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Spacer(),
 
-                        CloseButton(
-                          onPressed: () {
-                            widget.onClose();
-                            widget.onToggleBottomSheet(true);
-                          },
-                        ),
-                      ],
-                    ),
+                              CloseButton(
+                                color: Colors.white,
+                                onPressed: () {
+                                  widget.onClose();
+                                  widget.onToggleBottomSheet(true);
+                                  _imageSource = ImageSource.camera;
+                                  setState(() {});
+                                },
+                              ),
 
-                    Center(
-                      child: Image.file(
-                        widget.imageLabelResult.file!,
-                        width: 200,
-                        height: 200,
-                        fit: BoxFit.cover,
+                              SizedBox(width: 6),
+                            ],
+                          ),
+
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            child: Column(
+                              children: [
+                                Center(
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(16),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withValues(
+                                            alpha: 0.6,
+                                          ),
+                                          blurRadius: 14,
+                                          offset: Offset(0, 6),
+                                        ),
+                                      ],
+                                    ),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(16),
+                                      child: Image.file(
+                                        widget.imageLabelResult.file!,
+                                        width: double.infinity,
+                                        height: 250,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+
+                                SizedBox(height: 20),
+
+                                ..._getLabeledImagesWidget(),
+
+                                SizedBox(height: 100),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-
-                    SizedBox(height: 20),
-
-                    ..._getLabeledImagesWidget(),
-                  ],
+                  ),
                 ),
-              ),
+        ],
       ),
 
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
@@ -123,6 +174,8 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   FloatingActionButton(
+                    backgroundColor: Colors.tealAccent,
+                    foregroundColor: Colors.black,
                     heroTag: 'fab_camera',
                     onPressed: () {
                       setState(() => _imageSource = ImageSource.camera);
@@ -132,6 +185,8 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
                   ),
 
                   FloatingActionButton(
+                    backgroundColor: Colors.tealAccent,
+                    foregroundColor: Colors.black,
                     heroTag: 'fab_gallery',
                     onPressed: () {
                       setState(() => _imageSource = ImageSource.gallery);
@@ -141,6 +196,8 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
                   ),
 
                   FloatingActionButton(
+                    backgroundColor: Colors.tealAccent,
+                    foregroundColor: Colors.black,
                     heroTag: 'fab_save',
                     onPressed: () async {
                       widget.onSave();
