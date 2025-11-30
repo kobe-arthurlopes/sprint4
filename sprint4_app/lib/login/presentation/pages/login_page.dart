@@ -38,9 +38,6 @@ class _LoginPageState extends State<LoginPage> {
     _passwordController.addListener(() {
       _viewModel.setPassword(_passwordController.text);
     });
-
-    // 'mocked.email@gmail.com'
-    // 1234
   }
 
   @override
@@ -60,8 +57,8 @@ class _LoginPageState extends State<LoginPage> {
     );
 
     final loginMessage = isLoginValid
-        ? 'Login realizado com sucesso!'
-        : errorMessage ?? 'Ocorreu algum problema, tente novamente.';
+        ? 'Login successful!'
+        : errorMessage ?? 'Something went wrong, please try again.';
 
     final snackBarColor = isLoginValid ? Colors.green : Colors.redAccent;
 
@@ -105,7 +102,7 @@ class _LoginPageState extends State<LoginPage> {
                       SizedBox(height: 24),
 
                       Text(
-                        data.isSignIn ? 'Bem-vindo!' : 'Cadastro',
+                        data.isSignIn ? 'Welcome!' : 'Register',
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 32,
@@ -117,8 +114,8 @@ class _LoginPageState extends State<LoginPage> {
 
                       Text(
                         data.isSignIn
-                            ? 'Insira suas credenciais para continuar'
-                            : 'Insira suas informações para cadastro',
+                            ? 'Enter your credentials to continue.'
+                            : 'Enter your information to register.',
                         style: TextStyle(color: Colors.grey[400], fontSize: 16),
                         textAlign: TextAlign.center,
                       ),
@@ -218,8 +215,8 @@ class _LoginPageState extends State<LoginPage> {
                         children: [
                           Text(
                             data.isSignIn
-                                ? 'Não tem uma conta? '
-                                : 'Deseja se logar? ',
+                                ? "Don't have an account"
+                                : 'Do you want to log in?',
                             style: TextStyle(color: Colors.grey[400]),
                           ),
                           GestureDetector(
@@ -228,7 +225,7 @@ class _LoginPageState extends State<LoginPage> {
                               _resetFields();
                             },
                             child: Text(
-                              data.isSignIn ? 'Cadastre-se' : 'Voltar',
+                              data.isSignIn ? 'Register' : 'Go back',
                               style: TextStyle(
                                 color: Colors.blue,
                                 fontWeight: FontWeight.bold,

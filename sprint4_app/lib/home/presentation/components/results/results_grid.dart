@@ -8,13 +8,15 @@ class ResultsGrid extends StatefulWidget {
   final bool isLoading;
   final String emptyMessage;
   final VoidCallback? onRefresh;
+  final void Function(ImageLabelResult) onDelete;
 
   const ResultsGrid({
-    super.key, 
-    required this.results, 
+    super.key,
+    required this.results,
     required this.isLoading,
     required this.emptyMessage,
-    this.onRefresh
+    this.onRefresh,
+    required this.onDelete,
   });
 
   @override
@@ -25,16 +27,19 @@ class _ResultsGridState extends State<ResultsGrid> {
   void _showDetailsDialog(BuildContext context, ImageLabelResult result) {
     showDialog(
       context: context,
-      builder: (context) => ResultDetailsDialog(result: result),
+      builder: (context) => ResultDetailsDialog(
+        result: result,
+        onDelete: () {
+          widget.onDelete(result);
+        },
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     if (widget.isLoading) {
-      return Center(
-        child: CircularProgressIndicator(color: Colors.blue),
-      );
+      return Center(child: CircularProgressIndicator(color: Colors.blue));
     }
 
     if (widget.results.isEmpty) {
@@ -69,18 +74,17 @@ class _ResultsGridState extends State<ResultsGrid> {
           crossAxisSpacing: 16,
           mainAxisSpacing: 16,
           childAspectRatio: 0.75,
-        ), 
+        ),
         itemCount: widget.results.length,
         itemBuilder: (context, index) {
           final result = widget.results[index];
 
           return ResultCard(
-            result: result, 
+            result: result,
             onTap: () => _showDetailsDialog(context, result),
           );
-        }
-      ), 
+        },
+      ),
     );
-
   }
 }

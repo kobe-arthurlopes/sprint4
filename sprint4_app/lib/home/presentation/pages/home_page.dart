@@ -63,7 +63,7 @@ class _MyHomePageState extends State<HomePage> with TickerProviderStateMixin {
                     child: Padding(
                       padding: const EdgeInsets.only(top: 50),
                       child: Text(
-                        'Toque no botão para capturar uma imagem',
+                        'Tap the button to capture a new image',
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 20,
@@ -72,7 +72,7 @@ class _MyHomePageState extends State<HomePage> with TickerProviderStateMixin {
                         textAlign: TextAlign.center,
                       ),
                     ),
-                  )
+                  ),
                 ),
 
               if (data.shouldShowBottomSheet)
@@ -80,13 +80,17 @@ class _MyHomePageState extends State<HomePage> with TickerProviderStateMixin {
                   alignment: Alignment.bottomCenter,
                   child: DraggableBottomSheet(
                     expandedContent: ResultsGrid(
-                      results: data.results, 
-                      isLoading: data.isLoading, 
-                      emptyMessage: 'Nenhum resultado encontrado',
+                      results: data.results,
+                      isLoading: data.isLoading,
+                      emptyMessage: 'No results found',
                       onRefresh: _viewModel.refreshResults,
-                    )
+                      onDelete: (result) async {
+                        await _viewModel.deleteResult(result);
+                        await _viewModel.refreshResults();
+                      },
+                    ),
                   ),
-                )
+                ),
             ],
           ),
         );

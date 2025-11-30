@@ -150,7 +150,7 @@ class _DraggableBottomSheetState extends State<DraggableBottomSheet>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Meus registros',
+                  'My registers',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 18,
@@ -159,7 +159,7 @@ class _DraggableBottomSheetState extends State<DraggableBottomSheet>
                 ),
 
                 Text(
-                  'Arraste para cima',
+                  'Swipe up',
                   style: TextStyle(color: Colors.grey[400], fontSize: 14),
                 ),
               ],

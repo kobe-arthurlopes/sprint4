@@ -20,7 +20,7 @@ class SaveDialog extends StatelessWidget {
             SizedBox(width: 16),
 
             Text(
-              'Salvando...',
+              'Saving...',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 16,

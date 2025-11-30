@@ -65,7 +65,7 @@ class LoginButton extends StatelessWidget {
                 SizedBox(width: 5),
 
                 Text(
-                  'Continuar com ${method == LoginMethod.google ? 'Google' : 'Apple'}',
+                  'Sign in with ${method == LoginMethod.google ? 'Google' : 'Apple'}',
                   style: TextStyle(color: Colors.white, fontSize: 16),
                 ),
               ],

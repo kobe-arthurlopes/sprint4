@@ -29,6 +29,10 @@ class HomeViewModel {
     await repository.createResult(currentResult);
   }
 
+  Future<void> deleteResult(ImageLabelResult result) async {
+    await repository.deleteResult(result);
+  }
+
   Future<void> refreshResults() async {
     data.value = data.value.copyWith(isLoading: true);
     await fetch();

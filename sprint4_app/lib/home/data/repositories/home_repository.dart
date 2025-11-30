@@ -14,4 +14,8 @@ class HomeRepository {
   Future<void> createResult(ImageLabelResult result) async {
     await remote.createResult(result);
   }
+
+  Future<void> deleteResult(ImageLabelResult result) async {
+    await remote.deleteResult(result.id);
+  }
 }
