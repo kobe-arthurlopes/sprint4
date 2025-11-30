@@ -40,7 +40,7 @@ class LoginTextField extends StatelessWidget {
         )
       : null;
 
-  late final bool _obscureText = type == LoginTextFieldOption.email
+  late final bool _obscureText = type == LoginTextFieldOption.password
       ? !isVisible
       : false;
 
