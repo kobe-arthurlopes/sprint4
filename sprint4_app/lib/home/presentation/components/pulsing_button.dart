@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class PulsingButton extends StatefulWidget {
   final VoidCallback? onTap;
@@ -16,10 +17,18 @@ class _PulsingButtonState extends State<PulsingButton> with SingleTickerProvider
   @override
   void initState() {
     super.initState();
+
+    final isTesting = context.read<bool>();
+    final int duration = isTesting ? 0 : 1500;
+
     _controller = AnimationController(
-      duration: const Duration(milliseconds: 1500),
-      vsync: this,
-    )..repeat(reverse: true);
+      duration: Duration(milliseconds: duration),
+      vsync: this
+    );
+
+    if (!isTesting) {
+      _controller.repeat(reverse: true);
+    }
 
     _animation = Tween<double>(begin: 1.0, end: 1.2).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeInOut),

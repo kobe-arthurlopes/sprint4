@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sprint4_app/common/models/image_label_result.dart';
+import 'package:sprint4_app/common/service/image/image_service_protocol.dart';
 import 'package:sprint4_app/home/presentation/components/pulsing_button.dart';
 import 'package:sprint4_app/home/presentation/components/save_dialog.dart';
 
 class ImagePickerWidget extends StatefulWidget {
+  final ImageServiceProtocol service;
   final ImageLabelResult imageLabelResult;
-  final void Function(String) shouldLabelFile;
+  final Future<void> Function(String) shouldLabelFile;
   final void Function(bool) onToggleBottomSheet;
   final Future<void> Function() onSave;
   final void Function() onClose;
 
   ImagePickerWidget({
     super.key,
+    required this.service,
     ImageLabelResult? imageLabelResult,
     required this.shouldLabelFile,
     required this.onToggleBottomSheet,
@@ -25,18 +28,15 @@ class ImagePickerWidget extends StatefulWidget {
 }
 
 class _ImagePickerWidgetState extends State<ImagePickerWidget> {
-  final _picker = ImagePicker();
-  ImageSource _imageSource = ImageSource.camera;
+  Future<void> _pickImage() async {
+    final pickedFile = await widget.service.pickImage();
 
-  _pickImage() async {
-    final pickedImage = await _picker.pickImage(source: _imageSource);
-
-    if (pickedImage == null) {
+    if (pickedFile == null) {
       widget.onToggleBottomSheet(true);
       return;
     }
 
-    widget.shouldLabelFile(pickedImage.path);
+    await widget.shouldLabelFile(pickedFile.path);
   }
 
   List<Widget> _getLabeledImagesWidget() {
@@ -85,6 +85,7 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: const Key('imagePickerScaffold'),
       backgroundColor: Color(0xFF121212),
       body: Stack(
         children: [
@@ -92,9 +93,9 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
               ? Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: PulsingButton(
-                    onTap: () {
+                    onTap: () async {
                       widget.onToggleBottomSheet(false);
-                      _pickImage();
+                      await _pickImage();
                     },
                   ),
                 )
@@ -114,8 +115,7 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
                                 onPressed: () {
                                   widget.onClose();
                                   widget.onToggleBottomSheet(true);
-                                  _imageSource = ImageSource.camera;
-                                  setState(() {});
+                                  widget.service.setSource(ImageSource.camera);
                                 },
                               ),
 
@@ -181,9 +181,9 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
                     backgroundColor: Colors.tealAccent,
                     foregroundColor: Colors.black,
                     heroTag: 'fab_camera',
-                    onPressed: () {
-                      setState(() => _imageSource = ImageSource.camera);
-                      _pickImage();
+                    onPressed: () async {
+                      widget.service.setSource(ImageSource.camera);
+                      await _pickImage();
                     },
                     child: Icon(Icons.camera_alt),
                   ),
@@ -192,14 +192,15 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
                     backgroundColor: Colors.tealAccent,
                     foregroundColor: Colors.black,
                     heroTag: 'fab_gallery',
-                    onPressed: () {
-                      setState(() => _imageSource = ImageSource.gallery);
-                      _pickImage();
+                    onPressed: () async {
+                      widget.service.setSource(ImageSource.gallery);
+                      await _pickImage();
                     },
                     child: Icon(Icons.photo),
                   ),
 
                   FloatingActionButton(
+                    key: const Key('fabSaveButton'),
                     backgroundColor: Colors.tealAccent,
                     foregroundColor: Colors.black,
                     heroTag: 'fab_save',

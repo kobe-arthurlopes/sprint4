@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:sprint4_app/common/service/image/image_service_protocol.dart';
 import 'package:sprint4_app/home/data/models/home_data.dart';
 import 'package:sprint4_app/home/presentation/components/results/results_grid.dart';
 import 'package:sprint4_app/home/presentation/components/draggable_bottom_sheet.dart';
@@ -17,11 +18,15 @@ class HomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<HomePage> with TickerProviderStateMixin {
   late final HomeViewModel _viewModel;
+  late final ImageServiceProtocol _imageService;
+  late final bool _isTesting;
 
   @override
   void initState() {
     super.initState();
     _viewModel = context.read<HomeViewModel>();
+    _imageService = context.read<ImageServiceProtocol>();
+    _isTesting = context.read<bool>();
     _initialize();
   }
 
@@ -38,9 +43,13 @@ class _MyHomePageState extends State<HomePage> with TickerProviderStateMixin {
           body: Stack(
             children: [
               ImagePickerWidget(
+                service: _imageService,
                 imageLabelResult: data.currentResult,
                 shouldLabelFile: (filePath) async {
-                  await _viewModel.upateImageLabelResult(filePath);
+                  await _viewModel.upateImageLabelResult(
+                    filePath: filePath,
+                    isTesting: _isTesting,
+                  );
                 },
                 onToggleBottomSheet: (shouldToggleBottomSheet) {
                   _viewModel.updateShouldShowBottomSheet(

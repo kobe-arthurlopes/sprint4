@@ -167,6 +167,7 @@ class _DraggableBottomSheetState extends State<DraggableBottomSheet>
           ),
 
           IconButton(
+            key: const Key('swipeUpButton'),
             onPressed: _toggleSheet,
             icon: Icon(Icons.swipe_up_rounded, color: Colors.white, size: 32),
           ),

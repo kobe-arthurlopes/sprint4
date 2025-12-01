@@ -63,10 +63,10 @@ class _LoginPageState extends State<LoginPage> {
 
     final snackBarColor = isLoginValid ? Colors.green : Colors.redAccent;
 
+    if (!context.mounted) return;
+
     // Anuncia resultado ao leitor de tela
     SemanticsService.sendAnnouncement(View.of(context), loginMessage, TextDirection.ltr);
-
-    if (!context.mounted) return;
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(loginMessage), backgroundColor: snackBarColor),
@@ -151,6 +151,7 @@ class _LoginPageState extends State<LoginPage> {
                         Semantics(
                           container: true,
                           child: LoginTextField(
+                            key: const Key('emailField'),
                             type: LoginTextFieldOption.email,
                             controller: _emailController,
                             validator: (value) {
@@ -171,6 +172,7 @@ class _LoginPageState extends State<LoginPage> {
                         Semantics(
                           container: true,
                           child: LoginTextField(
+                            key: const Key('passwordField'),
                             type: LoginTextFieldOption.password,
                             controller: _passwordController,
                             isVisible: data.isPasswordVisible,
@@ -199,6 +201,7 @@ class _LoginPageState extends State<LoginPage> {
 
                         // Botão de Login com Email
                         LoginButton(
+                          key: const Key('emailLoginButton'),
                           method: LoginMethod.email,
                           onPressed: () async {
                             _viewModel.setMethod(LoginMethod.email);
@@ -321,7 +324,7 @@ class _LoginPageState extends State<LoginPage> {
                               ExcludeSemantics(
                                 child: Text(
                                   data.isSignIn
-                                      ? "Don't have an account"
+                                      ? "Don't have an account?"
                                       : 'Do you want to log in?',
                                   style: TextStyle(color: Colors.grey[400]),
                                 ),
