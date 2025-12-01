@@ -167,6 +167,7 @@ class _DraggableBottomSheetState extends State<DraggableBottomSheet>
           ),
 
           IconButton(
+            key: const Key('playIconButton'),
             onPressed: _toggleSheet,
             icon: Icon(Icons.play_arrow, color: Colors.white, size: 32),
           ),

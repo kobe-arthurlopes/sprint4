@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:provider/provider.dart';
+import 'package:sprint4_app/common/service/image/mock_image_service.dart';
 import 'package:sprint4_app/dependencies_injector.dart';
+import 'package:sprint4_app/home/presentation/components/draggable_bottom_sheet.dart';
+import 'package:sprint4_app/home/presentation/components/image_picker_widget.dart';
 import 'package:sprint4_app/home/presentation/components/pulsing_button.dart';
 import 'package:sprint4_app/home/presentation/pages/home_page.dart';
 import 'package:sprint4_app/login/presentation/pages/login_page.dart';
@@ -145,5 +148,18 @@ Future<void> main() async {
 
     await tester.tap(fabSaveFinder);
     await tester.pumpAndSettle();
+
+    await Future.delayed(const Duration(seconds: 10));
+
+    final sheetFinder = find.byType(DraggableBottomSheet);
+    expect(sheetFinder, findsOneWidget);
+
+    final playButtonFinder = find.byKey(const Key('playIconButton'));
+    expect(playButtonFinder, findsOneWidget);
+
+    await tester.tap(playButtonFinder);
+    await tester.pumpAndSettle();
+
+    await Future.delayed(const Duration(seconds: 3));
   });
 }

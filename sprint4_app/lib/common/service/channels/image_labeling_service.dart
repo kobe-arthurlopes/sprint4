@@ -59,14 +59,12 @@ class ImageLabelingService {
   }
 
   static Future<dynamic> _getMockedPredictionsResult() async {
+    final List<Map<String, dynamic>> arguments = [
+      {'index': 360, 'text': 'Dog', 'confidence': 0.9893},
+      {'index': 277, 'text': 'Pet', 'confidence': 0.9621},
+    ];
+
     await Future.delayed(const Duration(seconds: 2));
-
-    final Map<String, dynamic> map = {
-      'index': 1,
-      'text': 'Foo',
-      'confidence': 0.5,
-    };
-
-    return [map];
+    return arguments;
   }
 }
