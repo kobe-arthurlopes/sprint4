@@ -400,4 +400,10 @@ do <a href="https://developers.google.com/ml-kit" target="_blank">Google ML Kit<
 
 https://github.com/user-attachments/assets/f3bafc5a-5161-4b59-9d65-92a9b9a620d9
 
+----
+
+**Acessibilidade**
+
+- O aplicativo possui adaptação para o uso de leitores de tela como VoiceOver, especialmente na página de login, onde a maior parte das ações do usuário é esperada. Para isso, o widget nativo Semantic foi usado. Essa tecnologia ajusta elementos, ações e mensagens estejam corretamente expostos. Isso inclui rótulos, hints, agrupamentos semânticos e anúncios de feedback em tempo real.
+
 
