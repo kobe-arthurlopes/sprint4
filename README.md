@@ -387,6 +387,9 @@ do <a href="https://developers.google.com/ml-kit" target="_blank">Google ML Kit<
 
 - Autenticação: para que o usuário se autentique ao Supabase e tenha acesso ao seu banco de dados foram usados 3 métodos: ``Apple``, ``Google`` e ``Email``
 
-- ``Apple``: 
+---------
 
+**Acessibilidade**
+
+- O aplicativo possui adaptação para o uso de leitores de tela como VoiceOver, especialmente na página de login, onde a maior parte das ações do usuário é esperada. Para isso, o widget nativo Semantic foi usado. Essa tecnologia ajusta elementos, ações e mensagens estejam corretamente expostos. Isso inclui rótulos, hints, agrupamentos semânticos e anúncios de feedback em tempo real.
 
