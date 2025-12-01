@@ -22,54 +22,112 @@ class LoginButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: _backgroundColor,
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        shape: RoundedRectangleBorder(
-          side: BorderSide(color: _borderColor),
-          borderRadius: BorderRadius.circular(12),
+    final isLoadingState = isLoading ?? false;
+    
+    return Semantics(
+      button: true,
+      enabled: !isLoadingState,
+      label: _getSemanticLabel(),
+      hint: _getSemanticHint(),
+      onTap: isLoadingState ? null : onPressed,
+      child: ElevatedButton(
+        onPressed: isLoadingState ? null : onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: _backgroundColor,
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          shape: RoundedRectangleBorder(
+            side: BorderSide(color: _borderColor),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          elevation: 0,
         ),
-        elevation: 0,
+        child: _buildButtonContent(isLoadingState),
       ),
-      child: method == LoginMethod.email
-          ? isLoading != null && (isLoading ?? false)
-                ? SizedBox(
-                    height: 20,
-                    width: 20,
-                    child: CircularProgressIndicator(
-                      color: Colors.white,
-                      strokeWidth: 2,
-                    ),
-                  )
-                : Text(
-                    'Entrar',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  )
-          : Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                method == LoginMethod.google
-                    ? Image.asset(
-                        'images/google_icon.png',
-                        width: 20,
-                        fit: BoxFit.cover,
-                      )
-                    : Icon(Icons.apple, size: 26, color: Colors.white),
-
-                SizedBox(width: 5),
-
-                Text(
-                  'Sign in with ${method == LoginMethod.google ? 'Google' : 'Apple'}',
-                  style: TextStyle(color: Colors.white, fontSize: 16),
-                ),
-              ],
-            ),
     );
+  }
+
+  Widget _buildButtonContent(bool isLoadingState) {
+    if (method == LoginMethod.email) {
+      return _buildEmailButtonContent(isLoadingState);
+    }
+    return _buildSocialButtonContent();
+  }
+
+  Widget _buildEmailButtonContent(bool isLoadingState) {
+    if (isLoadingState) {
+      return Semantics(
+        label: 'Loading',
+        liveRegion: true,
+        child: ExcludeSemantics(
+          child: SizedBox(
+            height: 20,
+            width: 20,
+            child: CircularProgressIndicator(
+              color: Colors.white,
+              strokeWidth: 2,
+            ),
+          ),
+        ),
+      );
+    }
+
+    return ExcludeSemantics(
+      child: Text(
+        'Entrar',
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSocialButtonContent() {
+    final providerName = method == LoginMethod.google ? 'Google' : 'Apple';
+    
+    return ExcludeSemantics(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          method == LoginMethod.google
+              ? Image.asset(
+                  'images/google_icon.png',
+                  width: 20,
+                  fit: BoxFit.cover,
+                )
+              : Icon(Icons.apple, size: 26, color: Colors.white),
+          
+          SizedBox(width: 5),
+          
+          Text(
+            'Sign in with $providerName',
+            style: TextStyle(color: Colors.white, fontSize: 16),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _getSemanticLabel() {
+    if (method == LoginMethod.email) {
+      return isLoading ?? false ? 'Processing sign in' : 'Sign in button';
+    }
+    
+    final providerName = method == LoginMethod.google ? 'Google' : 'Apple';
+    return 'Sign in with $providerName button';
+  }
+
+  String _getSemanticHint() {
+    if (isLoading ?? false) {
+      return 'Please wait while processing';
+    }
+    
+    if (method == LoginMethod.email) {
+      return 'Double tap to sign in with email and password';
+    }
+    
+    final providerName = method == LoginMethod.google ? 'Google' : 'Apple';
+    return 'Double tap to sign in with your $providerName account';
   }
 }
