@@ -73,7 +73,7 @@ class LoginButton extends StatelessWidget {
 
     return ExcludeSemantics(
       child: Text(
-        'Entrar',
+        'Login',
         style: TextStyle(
           color: Colors.white,
           fontSize: 16,
