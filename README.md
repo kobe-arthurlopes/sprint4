@@ -387,6 +387,17 @@ do <a href="https://developers.google.com/ml-kit" target="_blank">Google ML Kit<
 
 - Autenticação: para que o usuário se autentique ao Supabase e tenha acesso ao seu banco de dados foram usados 3 métodos: ``Apple``, ``Google`` e ``Email``
 
-- ``Apple``: 
+- ``Apple``: dependência ``sign_in_with_apple`` e configuração do Provider da Apple no Authentication do Supabase
+
+- ``Google``: dependência ``google_sign_in`` e configuração do Provider do Google no Authentication do Supabase
+
+- ``Email``: uso do método ``signInWithPassword`` do ``supabase_flutter`` e configuração do Provider do Email no Authentication do Supabase
+
+----
+
+**Testes Automatizados**
+
+
+https://github.com/user-attachments/assets/f3bafc5a-5161-4b59-9d65-92a9b9a620d9
 
 
