@@ -168,7 +168,7 @@ class _DraggableBottomSheetState extends State<DraggableBottomSheet>
 
           IconButton(
             onPressed: _toggleSheet,
-            icon: Icon(Icons.play_arrow, color: Colors.white, size: 32),
+            icon: Icon(Icons.swipe_up_rounded, color: Colors.white, size: 32),
           ),
         ],
       ),
