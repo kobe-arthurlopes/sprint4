@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:sprint4_app/common/service/sign_in/sign_in_method.dart';
+import 'package:sprint4_app/common/service/authentication/login_method.dart';
 
-class SignInButton extends StatelessWidget {
-  final SignInMethod method;
+class LoginButton extends StatelessWidget {
+  final LoginMethod method;
   final VoidCallback onPressed;
   final bool? isLoading;
 
-  late final Color backgroundColor = method == SignInMethod.email
+  late final Color _backgroundColor = method == LoginMethod.email
       ? Colors.blue
       : Colors.black;
-  late final Color borderColor = method == SignInMethod.email
+  late final Color _borderColor = method == LoginMethod.email
       ? Colors.transparent
       : Colors.grey[800]!;
 
-  SignInButton({
+  LoginButton({
     super.key,
     required this.method,
     required this.onPressed,
@@ -25,15 +25,15 @@ class SignInButton extends StatelessWidget {
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
-        backgroundColor: backgroundColor,
+        backgroundColor: _backgroundColor,
         padding: const EdgeInsets.symmetric(vertical: 16),
         shape: RoundedRectangleBorder(
-          side: BorderSide(color: borderColor),
+          side: BorderSide(color: _borderColor),
           borderRadius: BorderRadius.circular(12),
         ),
         elevation: 0,
       ),
-      child: method == SignInMethod.email
+      child: method == LoginMethod.email
           ? isLoading != null && (isLoading ?? false)
                 ? SizedBox(
                     height: 20,
@@ -54,7 +54,7 @@ class SignInButton extends StatelessWidget {
           : Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                method == SignInMethod.google
+                method == LoginMethod.google
                     ? Image.asset(
                         'images/google_icon.png',
                         width: 20,
@@ -65,7 +65,7 @@ class SignInButton extends StatelessWidget {
                 SizedBox(width: 5),
 
                 Text(
-                  'Continuar com ${method == SignInMethod.google ? 'Google' : 'Apple'}',
+                  'Sign in with ${method == LoginMethod.google ? 'Google' : 'Apple'}',
                   style: TextStyle(color: Colors.white, fontSize: 16),
                 ),
               ],

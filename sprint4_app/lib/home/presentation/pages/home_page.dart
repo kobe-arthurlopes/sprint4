@@ -32,45 +32,69 @@ class _MyHomePageState extends State<HomePage> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<HomeData>(
-      valueListenable: _viewModel.data, 
+      valueListenable: _viewModel.data,
       builder: (_, data, _) {
         return Scaffold(
           body: Stack(
             children: [
               ImagePickerWidget(
-                imageLabelResult: data.currentResult, 
+                imageLabelResult: data.currentResult,
                 shouldLabelFile: (filePath) async {
                   await _viewModel.upateImageLabelResult(filePath);
-                }, 
+                },
                 onToggleBottomSheet: (shouldToggleBottomSheet) {
-                  _viewModel.updateShouldShowBottomSheet(value: shouldToggleBottomSheet);
-                }, 
+                  _viewModel.updateShouldShowBottomSheet(
+                    value: shouldToggleBottomSheet,
+                  );
+                },
                 onSave: () async {
-                  // TODO: - Colocar loading
-
                   await _viewModel.createData();
                   await _viewModel.fetch();
                   _viewModel.resetCurrentResult();
                   _viewModel.updateShouldShowBottomSheet(value: true);
-                }, 
-                onClose: () {
-                  _viewModel.resetCurrentResult();
-                }
+                },
+                onClose: _viewModel.resetCurrentResult,
               ),
 
+              if (data.currentResult?.file == null)
+                SafeArea(
+                  child: Align(
+                    alignment: Alignment.topCenter,
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 50),
+                      child: Text(
+                        'Tap the button to capture a new image',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+                ),
+
               if (data.shouldShowBottomSheet)
-                DraggableBottomSheet(
-                  expandedContent: ResultsGrid(
-                    results: data.results, 
-                    isLoading: data.isLoading, 
-                    emptyMessage: 'Nenhum resultado encontrado',
-                    onRefresh: _viewModel.refreshResults,
-                  )
-                )
+                Align(
+                  alignment: Alignment.bottomCenter,
+                  child: DraggableBottomSheet(
+                    expandedContent: ResultsGrid(
+                      results: data.results,
+                      isLoading: data.isLoading,
+                      emptyMessage: 'No results found',
+                      onRefresh: _viewModel.refreshResults,
+                      onDelete: (result) async {
+                        await _viewModel.deleteResult(result);
+                        await _viewModel.refreshResults();
+                      },
+                    ),
+                  ),
+                ),
             ],
           ),
         );
-      }
+      },
     );
   }
 }

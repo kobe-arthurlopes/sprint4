@@ -30,7 +30,6 @@ class SupabaseService implements SupabaseServiceProtocol {
 
     try {
       final data = await _supabase.from('labels').select();
-
       return data.map((element) => Label.fromMap(element)).toList();
     } catch (error) {
       print('error getting labels -> $error');

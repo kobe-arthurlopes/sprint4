@@ -63,7 +63,7 @@ class ResultCard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'Predições',
+                      'Predictions',
                       style: TextStyle(
                         color: Colors.grey[400],
                         fontSize: 12,
@@ -106,7 +106,7 @@ class ResultCard extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.only(top: 4),
                         child: Text(
-                          '+${result.predictions.length - 2} mais',
+                          '+${result.predictions.length - 2} more',
                           style: TextStyle(
                             color: Colors.grey[500],
                             fontSize: 11,

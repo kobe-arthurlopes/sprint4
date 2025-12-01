@@ -11,8 +11,10 @@ class HomeViewModel {
   HomeViewModel({required this.repository});
 
   Future<void> fetch() async {
+    data.value = data.value.copyWith(isLoading: true);
     final homeData = await repository.fetchData();
     data.value = homeData;
+    data.value = data.value.copyWith(isLoading: false);
   }
 
   Future<void> upateImageLabelResult(String filePath) async {
@@ -25,6 +27,10 @@ class HomeViewModel {
     final currentResult = data.value.currentResult;
     if (currentResult == null) return;
     await repository.createResult(currentResult);
+  }
+
+  Future<void> deleteResult(ImageLabelResult result) async {
+    await repository.deleteResult(result);
   }
 
   Future<void> refreshResults() async {
@@ -40,6 +46,8 @@ class HomeViewModel {
 
   void updateShouldShowBottomSheet({required bool value}) {
     final shouldShowBottomSheet = value;
-    data.value = data.value.copyWith(shouldShowBottomSheet: shouldShowBottomSheet);
+    data.value = data.value.copyWith(
+      shouldShowBottomSheet: shouldShowBottomSheet,
+    );
   }
 }

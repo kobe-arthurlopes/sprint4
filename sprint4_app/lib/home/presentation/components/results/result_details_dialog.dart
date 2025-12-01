@@ -3,10 +3,12 @@ import 'package:sprint4_app/common/models/image_label_result.dart';
 
 class ResultDetailsDialog extends StatelessWidget {
   final ImageLabelResult result;
+  final VoidCallback onDelete;
 
   const ResultDetailsDialog({
     super.key,
     required this.result,
+    required this.onDelete,
   });
 
   @override
@@ -32,10 +34,10 @@ class ResultDetailsDialog extends StatelessWidget {
               ),
 
             SizedBox(height: 24),
-            
+
             // Título
             Text(
-              'Predições',
+              'Predictions',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 20,
@@ -44,50 +46,57 @@ class ResultDetailsDialog extends StatelessWidget {
             ),
 
             SizedBox(height: 16),
-            
+
             // Lista de predições com scroll se necessário
             Flexible(
               child: SingleChildScrollView(
                 child: Column(
-                  children: result.predictions.map((prediction) => Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 8,
-                          height: 8,
-                          decoration: BoxDecoration(
-                            color: Colors.blue,
-                            shape: BoxShape.circle,
+                  children: result.predictions
+                      .map(
+                        (prediction) => Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 8,
+                                height: 8,
+                                decoration: BoxDecoration(
+                                  color: Colors.blue,
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+
+                              SizedBox(width: 12),
+
+                              Expanded(
+                                child: Text(
+                                  prediction.label.text,
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
+
+                              Text(
+                                '${(prediction.confidenceDecimal * 100).toStringAsFixed(1)}%',
+                                style: TextStyle(
+                                  color: Colors.grey[400],
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-
-                        SizedBox(width: 12),
-
-                        Expanded(
-                          child: Text(
-                            prediction.label.text,
-                            style: TextStyle(color: Colors.white, fontSize: 16),
-                          ),
-                        ),
-
-                        Text(
-                          '${(prediction.confidenceDecimal * 100).toStringAsFixed(1)}%',
-                          style: TextStyle(
-                            color: Colors.grey[400],
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  )).toList(),
+                      )
+                      .toList(),
                 ),
               ),
             ),
-            
+
             SizedBox(height: 24),
-            
+
             // Botão fechar
             SizedBox(
               width: double.infinity,
@@ -101,7 +110,30 @@ class ResultDetailsDialog extends StatelessWidget {
                   ),
                 ),
                 child: Text(
-                  'Fechar',
+                  'Close',
+                  style: TextStyle(color: Colors.white, fontSize: 16),
+                ),
+              ),
+            ),
+
+            SizedBox(height: 10),
+
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  onDelete();
+                  Navigator.pop(context);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  padding: EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: Text(
+                  'Delete',
                   style: TextStyle(color: Colors.white, fontSize: 16),
                 ),
               ),

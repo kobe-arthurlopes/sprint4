@@ -3,10 +3,7 @@ import 'package:flutter/material.dart';
 class DraggableBottomSheet extends StatefulWidget {
   final Widget expandedContent;
 
-  const DraggableBottomSheet({
-    super.key, 
-    required this.expandedContent,
-  });
+  const DraggableBottomSheet({super.key, required this.expandedContent});
 
   @override
   State<DraggableBottomSheet> createState() => _DraggableBottomSheetState();
@@ -16,20 +13,25 @@ class _DraggableBottomSheetState extends State<DraggableBottomSheet>
     with SingleTickerProviderStateMixin {
   final double _minHeight = 120;
   final double _maxHeight = 800;
-  double _currentHeight = 120;
-  bool _isExpanded = false;
-  bool _isDragging = false;
-  
+
   late AnimationController _controller;
+  late Animation<double> _heightAnimation;
+
+  bool get _isExpanded => _controller.value > 0.5;
 
   @override
   void initState() {
     super.initState();
 
     _controller = AnimationController(
-      duration: const Duration(milliseconds: 600),
+      duration: const Duration(milliseconds: 400),
       vsync: this,
     );
+
+    _heightAnimation = Tween<double>(
+      begin: _minHeight,
+      end: _maxHeight,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
   }
 
   @override
@@ -44,49 +46,28 @@ class _DraggableBottomSheetState extends State<DraggableBottomSheet>
     } else {
       _controller.forward();
     }
-
-    setState(() {
-      _isExpanded = !_isExpanded;
-    });
-  }
-
-  void _handleDragStart() {
-    setState(() => _isDragging = true);
   }
 
   void _handleDragUpdate(DragUpdateDetails details) {
-    setState(() {
-      _currentHeight -= details.delta.dy;
-      _currentHeight = _currentHeight.clamp(_minHeight, _maxHeight);
-    });
+    final delta = details.primaryDelta;
+
+    if (delta == null) return;
+
+    final newValue = _controller.value - (delta / (_maxHeight - _minHeight));
+    _controller.value = newValue.clamp(0, 1);
   }
 
   void _handleDragEnd(DragEndDetails details) {
-    setState(() => _isDragging = false);
+    final velocity = details.primaryVelocity ?? 0;
 
-    final threshold = 5.0;
-    final primaryVelocity = details.primaryVelocity;
-
-    if (primaryVelocity == null) return;
-
-    if (primaryVelocity < -threshold) {
-      _currentHeight = _maxHeight;
+    if (velocity < -200) {
       _controller.forward();
-      setState(() {
-        _isExpanded = true;
-      });
-    } else if (primaryVelocity > threshold) {
-      _currentHeight = _minHeight;
+    } else if (velocity > 200) {
       _controller.reverse();
-      setState(() {
-        _isExpanded = false;
-      });
     } else {
-      if (_isExpanded) {
-        _currentHeight = _maxHeight;
+      if (_controller.value > 0.5) {
         _controller.forward();
       } else {
-        _currentHeight = _minHeight;
         _controller.reverse();
       }
     }
@@ -94,36 +75,35 @@ class _DraggableBottomSheetState extends State<DraggableBottomSheet>
 
   @override
   Widget build(BuildContext context) {
-    return Positioned(
-      left: 0,
-      right: 0,
-      bottom: 0,
-      child: GestureDetector(
-        onVerticalDragStart: (_) => _handleDragStart(),
-        onVerticalDragUpdate: _handleDragUpdate,
-        onVerticalDragEnd: _handleDragEnd,
-        child: Container(
-          height: _currentHeight,
-          decoration: BoxDecoration(
-            color: Color(0xFF1E1E1E),
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.5),
-                blurRadius: 20,
-                offset: Offset(0, -5),
-              ),
-            ],
-          ),
-          child:
-            Column(
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (_, _) {
+        final height = _heightAnimation.value;
+    
+        return GestureDetector(
+          onVerticalDragUpdate: _handleDragUpdate,
+          onVerticalDragEnd: _handleDragEnd,
+          child: Container(
+            height: height,
+            decoration: BoxDecoration(
+              color: Color(0xFF1E1E1E),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.5),
+                  blurRadius: 20,
+                  offset: Offset(0, -5),
+                ),
+              ],
+            ),
+            child: Column(
               children: [
                 // Handle (barra de arrasto)
                 GestureDetector(
                   onTap: _toggleSheet,
                   child: Container(
                     width: double.infinity,
-                    padding: EdgeInsets.symmetric(vertical: 16),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
                     child: Center(
                       child: Container(
                         width: 40,
@@ -136,62 +116,62 @@ class _DraggableBottomSheetState extends State<DraggableBottomSheet>
                     ),
                   ),
                 ),
-                  
-                // Conteúdo minimizado
-                if (_currentHeight <= 200)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 60,
-                          height: 60,
-                          decoration: BoxDecoration(
-                            color: Colors.blue,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Icon(Icons.photo_library, color: Colors.white),
-                        ),
-
-                        SizedBox(width: 16),
-
-                        Expanded(
-                          child: 
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Meus registros',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-
-                              Text(
-                                'Arraste para cima',
-                                style: TextStyle(
-                                  color: Colors.grey[400],
-                                  fontSize: 14,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        Icon(Icons.play_arrow, color: Colors.white, size: 32),
-                      ],
-                    ),
-                  ),
-                  
-                  // Conteúdo adicional (expandido)
-                  if (_currentHeight > 200)
-                    Expanded(child: widget.expandedContent)
-                ],
-              ),
+    
+                if (height <= 200) _buildCompactView(),
+    
+                if (height > 200) Expanded(child: widget.expandedContent),
+              ],
             ),
-        ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildCompactView() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Row(
+        children: [
+          Container(
+            width: 60,
+            height: 60,
+            decoration: BoxDecoration(
+              color: Colors.blue,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(Icons.photo_library, color: Colors.white),
+          ),
+
+          SizedBox(width: 16),
+
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'My registers',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+
+                Text(
+                  'Swipe up',
+                  style: TextStyle(color: Colors.grey[400], fontSize: 14),
+                ),
+              ],
+            ),
+          ),
+
+          IconButton(
+            onPressed: _toggleSheet,
+            icon: Icon(Icons.play_arrow, color: Colors.white, size: 32),
+          ),
+        ],
+      ),
     );
   }
 }
