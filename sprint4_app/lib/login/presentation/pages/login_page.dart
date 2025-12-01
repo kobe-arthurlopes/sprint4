@@ -123,6 +123,7 @@ class _LoginPageState extends State<LoginPage> {
 
                       // Campo de Email
                       LoginTextField(
+                        key: const Key('emailField'),
                         type: LoginTextFieldOption.email,
                         controller: _emailController,
                         validator: _viewModel.validateEmail,
@@ -131,6 +132,7 @@ class _LoginPageState extends State<LoginPage> {
 
                       // Campo de Senha
                       LoginTextField(
+                        key: const Key('passwordField'),
                         type: LoginTextFieldOption.password,
                         controller: _passwordController,
                         isVisible: data.isPasswordVisible,
@@ -142,6 +144,7 @@ class _LoginPageState extends State<LoginPage> {
 
                       // Login com email
                       LoginButton(
+                        key: const Key('loginButtonEmail'),
                         method: LoginMethod.email,
                         onPressed: () async {
                           print('Login com email e senha');
@@ -215,8 +218,8 @@ class _LoginPageState extends State<LoginPage> {
                         children: [
                           Text(
                             data.isSignIn
-                                ? "Don't have an account"
-                                : 'Do you want to log in?',
+                                ? "Don't have an account "
+                                : 'Do you want to log in? ',
                             style: TextStyle(color: Colors.grey[400]),
                           ),
                           GestureDetector(

@@ -1,46 +1,46 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sprint4_app/common/models/image_label_result.dart';
+import 'package:sprint4_app/common/service/image/image_service_protocol.dart';
 import 'package:sprint4_app/home/presentation/components/pulsing_button.dart';
 import 'package:sprint4_app/home/presentation/components/save_dialog.dart';
 
 class ImagePickerWidget extends StatefulWidget {
-  final ImageLabelResult imageLabelResult;
-  final void Function(String) shouldLabelFile;
+  final ImageServiceProtocol service;
+  final ImageLabelResult result;
+  final Future<void> Function(String) shouldLabelFile;
   final void Function(bool) onToggleBottomSheet;
   final Future<void> Function() onSave;
   final void Function() onClose;
 
   ImagePickerWidget({
     super.key,
-    ImageLabelResult? imageLabelResult,
+    required this.service,
+    ImageLabelResult? result,
     required this.shouldLabelFile,
     required this.onToggleBottomSheet,
     required this.onSave,
     required this.onClose,
-  }) : imageLabelResult = imageLabelResult ?? ImageLabelResult();
+  }) : result = result ?? ImageLabelResult();
 
   @override
   State<StatefulWidget> createState() => _ImagePickerWidgetState();
 }
 
 class _ImagePickerWidgetState extends State<ImagePickerWidget> {
-  final _picker = ImagePicker();
-  ImageSource _imageSource = ImageSource.camera;
+  Future<void> _pickImage() async {
+    final pickedFile = await widget.service.pickImage();
 
-  _pickImage() async {
-    final pickedImage = await _picker.pickImage(source: _imageSource);
-
-    if (pickedImage == null) {
+    if (pickedFile == null) {
       widget.onToggleBottomSheet(true);
       return;
     }
 
-    widget.shouldLabelFile(pickedImage.path);
+    await widget.shouldLabelFile(pickedFile.path);
   }
 
   List<Widget> _getLabeledImagesWidget() {
-    final result = widget.imageLabelResult;
+    final result = widget.result;
 
     if (result.predictions.isEmpty) return [];
 
@@ -85,16 +85,17 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF121212),
+      key: const Key('imagePickerScaffold'),
+      backgroundColor: Colors.transparent,
       body: Stack(
         children: [
-          widget.imageLabelResult.file == null
+          widget.result.file == null
               ? Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: PulsingButton(
-                    onTap: () {
+                    onTap: () async {
                       widget.onToggleBottomSheet(false);
-                      _pickImage();
+                      await _pickImage();
                     },
                   ),
                 )
@@ -114,8 +115,7 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
                                 onPressed: () {
                                   widget.onClose();
                                   widget.onToggleBottomSheet(true);
-                                  _imageSource = ImageSource.camera;
-                                  setState(() {});
+                                  widget.service.setSource(ImageSource.camera);
                                 },
                               ),
 
@@ -144,7 +144,7 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.circular(16),
                                       child: Image.file(
-                                        widget.imageLabelResult.file!,
+                                        widget.result.file!,
                                         width: double.infinity,
                                         height: 250,
                                         fit: BoxFit.cover,
@@ -171,19 +171,21 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
 
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: Padding(
+        key: const Key('fabPadding'),
         padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: widget.imageLabelResult.file == null
+        child: widget.result.file == null
             ? SizedBox()
             : Row(
+                key: const Key('fabRow'),
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   FloatingActionButton(
                     backgroundColor: Colors.tealAccent,
                     foregroundColor: Colors.black,
                     heroTag: 'fab_camera',
-                    onPressed: () {
-                      setState(() => _imageSource = ImageSource.camera);
-                      _pickImage();
+                    onPressed: () async {
+                      widget.service.setSource(ImageSource.camera);
+                      await _pickImage();
                     },
                     child: Icon(Icons.camera_alt),
                   ),
@@ -192,14 +194,15 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
                     backgroundColor: Colors.tealAccent,
                     foregroundColor: Colors.black,
                     heroTag: 'fab_gallery',
-                    onPressed: () {
-                      setState(() => _imageSource = ImageSource.gallery);
-                      _pickImage();
+                    onPressed: () async {
+                      widget.service.setSource(ImageSource.gallery);
+                      await _pickImage();
                     },
                     child: Icon(Icons.photo),
                   ),
 
                   FloatingActionButton(
+                    key: const Key('fabSave'),
                     backgroundColor: Colors.tealAccent,
                     foregroundColor: Colors.black,
                     heroTag: 'fab_save',

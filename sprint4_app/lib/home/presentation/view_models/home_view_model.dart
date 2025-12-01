@@ -17,8 +17,15 @@ class HomeViewModel {
     data.value = data.value.copyWith(isLoading: false);
   }
 
-  Future<void> upateImageLabelResult(String filePath) async {
-    final currentResult = await ImageLabelingService.getLabeledImage(filePath);
+  Future<void> upateImageLabelResult({
+    required String filePath,
+    bool isTesting = false,
+  }) async {
+    final currentResult = await ImageLabelingService.getLabeledImage(
+      filePath: filePath,
+      isTesting: isTesting,
+    );
+
     currentResult.filePath = filePath;
     data.value = data.value.copyWith(currentResult: currentResult);
   }

@@ -44,7 +44,7 @@ class LoginButton extends StatelessWidget {
                     ),
                   )
                 : Text(
-                    'Entrar',
+                    'Login',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 16,

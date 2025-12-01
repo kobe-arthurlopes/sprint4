@@ -7,7 +7,10 @@ import 'package:sprint4_app/common/models/label.dart';
 import 'package:sprint4_app/common/models/prediction.dart';
 
 class ImageLabelingService {
-  static Future<ImageLabelResult> getLabeledImage(String filePath) async {
+  static Future<ImageLabelResult> getLabeledImage({
+    required String filePath,
+    bool isTesting = false,
+  }) async {
     if (filePath.isEmpty) return ImageLabelResult();
 
     final file = File(filePath);
@@ -15,9 +18,16 @@ class ImageLabelingService {
     final bytes = await file.readAsBytes();
     final list = bytes.buffer.asUint8List();
     final arguments = {'bytes': list};
-    final result = await MethodChannelType.imageLabeling.getResult(
-      arguments: arguments,
-    );
+
+    dynamic result;
+
+    if (isTesting) {
+      result = await ImageLabelingService._getMockedPredictionsResult();
+    } else {
+      result = await MethodChannelType.imageLabeling.getResult(
+        arguments: arguments,
+      );
+    }
 
     final predictions = (result as List)
         .map(
@@ -28,15 +38,17 @@ class ImageLabelingService {
         .toList();
 
     return ImageLabelResult(
-      predictions: predictions, 
-      filePath: filePath, 
-      file: file
+      predictions: predictions,
+      filePath: filePath,
+      file: file,
     );
   }
 
   static Future<List<Label>> fetchLabelsFromJson() async {
     try {
-      final jsonString = await rootBundle.loadString('lib/common/models/labels.json');
+      final jsonString = await rootBundle.loadString(
+        'lib/common/models/labels.json',
+      );
       final data = json.decode(jsonString);
       final maps = (data as List).cast<Map<String, dynamic>>();
       return maps.map((element) => Label.fromMap(element)).toList();
@@ -44,5 +56,17 @@ class ImageLabelingService {
       print('error loading labels.json -> $error');
       return [];
     }
+  }
+
+  static Future<dynamic> _getMockedPredictionsResult() async {
+    await Future.delayed(const Duration(seconds: 2));
+
+    final Map<String, dynamic> map = {
+      'index': 1,
+      'text': 'Foo',
+      'confidence': 0.5,
+    };
+
+    return [map];
   }
 }
