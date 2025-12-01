@@ -23,8 +23,8 @@ class LoginTextField extends StatelessWidget {
       : null;
 
   late final String _labelText = type == LoginTextFieldOption.email
-      ? "Email"
-      : "Senha";
+      ? "E-mail"
+      : "Password";
 
   late final IconData _prefixIconData = type == LoginTextFieldOption.email
       ? Icons.email_outlined

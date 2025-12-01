@@ -6,7 +6,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final depenciesInjector = DependenciesInjector(isTesting: true);
+  final depenciesInjector = DependenciesInjector();
 
   await Supabase.initialize(
     url: 'https://xrelnsmrfjvyiamzpsbp.supabase.co',
