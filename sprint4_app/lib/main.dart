@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:sprint4_app/common/service/supabase/supabase_service_protocol.dart';
 import 'package:sprint4_app/dependencies_injector.dart';
 import 'package:sprint4_app/routes.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -19,10 +20,10 @@ Future<void> main() async {
       providers: [
         ...depenciesInjector.serviceProviders(),
         ...depenciesInjector.loginProviders(),
-        ...depenciesInjector.homeProviders()
+        ...depenciesInjector.homeProviders(),
       ],
       child: const MyApp(),
-    )
+    ),
   );
 }
 
@@ -31,10 +32,17 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final routes = Routes();
+    final SupabaseServiceProtocol supabaseService = context
+        .read<SupabaseServiceProtocol>();
+
+    final initialRouterLocation =
+        supabaseService.authentication.hasExistingSession()
+        ? '/home'
+        : '/login';
+
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
-      routerConfig: routes.config(context)
+      routerConfig: Routes().config(initialLocation: initialRouterLocation),
     );
   }
 }
