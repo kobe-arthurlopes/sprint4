@@ -48,6 +48,17 @@ class AuthenticationService implements AuthenticationServiceProtocol {
   }
 
   @override
+  Future<void> signOut() async {
+    if (client == null) {
+      throw const AuthException('Client invalid - not signing out');
+    }
+
+    print('signing out');
+
+    await client!.signOut();
+  }
+
+  @override
   Future<AuthResponse?> getSignInResponse() async {
     if (client == null) {
       throw const AuthException('Client Auth invalid to get auth response');

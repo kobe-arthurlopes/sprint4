@@ -23,14 +23,12 @@ class HomePage extends StatefulWidget {
 class _MyHomePageState extends State<HomePage> with TickerProviderStateMixin {
   late final HomeViewModel _viewModel;
   late final ImageServiceProtocol _imageService;
-  late final bool _isTesting;
 
   @override
   void initState() {
     super.initState();
     _viewModel = context.read<HomeViewModel>();
     _imageService = context.read<ImageServiceProtocol>();
-    _isTesting = context.read<bool>();
     _initialize();
   }
 
@@ -46,7 +44,6 @@ class _MyHomePageState extends State<HomePage> with TickerProviderStateMixin {
 
     final result = await _viewModel.upateImageLabelResult(
       filePath: pickedFiled.path,
-      isTesting: _isTesting,
     );
 
     if (result.file == null) return;
@@ -77,7 +74,7 @@ class _MyHomePageState extends State<HomePage> with TickerProviderStateMixin {
       valueListenable: _viewModel.data,
       builder: (_, data, _) {
         return Semantics(
-          label: 'home page',
+          identifier: 'home',
           child: Scaffold(
             backgroundColor: Color(0xFF121212),
             body: Stack(
@@ -107,29 +104,23 @@ class _MyHomePageState extends State<HomePage> with TickerProviderStateMixin {
                           ),
                         ),
                       ),
-          
+
                       Align(
                         alignment: Alignment.center,
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Semantics(
-                              identifier: 'home_pulsing_button',
-                              label: 'pulsing',
-                              hint: 'double tap to select an image from camera',
-                              button: true,
-                              child: PulsingButton(
-                                onTap: () async {
-                                  await _pickImage(source: ImageSource.camera);
-                                },
-                              ),
+                            PulsingButton(
+                              onTap: () async {
+                                await _pickImage(source: ImageSource.camera);
+                              },
                             ),
-          
+
                             SizedBox(height: 100),
-          
+
                             Semantics(
                               identifier: 'home_pick_from_gallery',
-                              hint: 'double tap to select an image from gallery',
+                              hint: 'tap to open gallery',
                               button: true,
                               child: GestureDetector(
                                 onTap: () async {
@@ -151,7 +142,7 @@ class _MyHomePageState extends State<HomePage> with TickerProviderStateMixin {
                     ],
                   ),
                 ),
-          
+
                 Align(
                   alignment: Alignment.bottomCenter,
                   child: DraggableBottomSheet(
