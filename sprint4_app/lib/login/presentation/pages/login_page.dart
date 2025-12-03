@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:sprint4_app/common/service/authentication/login_method.dart';
-import 'package:sprint4_app/home/presentation/pages/home_page.dart';
 import 'package:sprint4_app/login/data/models/login_data.dart';
 import 'package:sprint4_app/login/presentation/components/login_button.dart';
 import 'package:sprint4_app/login/presentation/components/login_text_field.dart';
