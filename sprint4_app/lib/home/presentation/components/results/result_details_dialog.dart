@@ -3,11 +3,13 @@ import 'package:sprint4_app/common/models/image_label_result.dart';
 
 class ResultDetailsDialog extends StatelessWidget {
   final ImageLabelResult result;
-  final VoidCallback onDelete;
+  final int index;
+  final void Function(int) onDelete;
 
   const ResultDetailsDialog({
     super.key,
     required this.result,
+    required this.index,
     required this.onDelete,
   });
 
@@ -55,38 +57,40 @@ class ResultDetailsDialog extends StatelessWidget {
                       .map(
                         (prediction) => Padding(
                           padding: const EdgeInsets.only(bottom: 12),
-                          child: Row(
-                            children: [
-                              Container(
-                                width: 8,
-                                height: 8,
-                                decoration: BoxDecoration(
-                                  color: Colors.blue,
-                                  shape: BoxShape.circle,
-                                ),
-                              ),
-
-                              SizedBox(width: 12),
-
-                              Expanded(
-                                child: Text(
-                                  prediction.label.text,
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16,
+                          child: MergeSemantics(
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 8,
+                                  height: 8,
+                                  decoration: BoxDecoration(
+                                    color: Colors.blue,
+                                    shape: BoxShape.circle,
                                   ),
                                 ),
-                              ),
-
-                              Text(
-                                '${(prediction.confidenceDecimal * 100).toStringAsFixed(1)}%',
-                                style: TextStyle(
-                                  color: Colors.grey[400],
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
+                            
+                                SizedBox(width: 12),
+                            
+                                Expanded(
+                                  child: Text(
+                                    prediction.label.text,
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ],
+                            
+                                Text(
+                                  prediction.confidenceText,
+                                  style: TextStyle(
+                                    color: Colors.grey[400],
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       )
@@ -122,7 +126,7 @@ class ResultDetailsDialog extends StatelessWidget {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {
-                  onDelete();
+                  onDelete(index);
                   Navigator.pop(context);
                 },
                 style: ElevatedButton.styleFrom(

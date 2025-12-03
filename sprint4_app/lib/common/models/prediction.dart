@@ -18,7 +18,7 @@ class Prediction {
     final labelText = map['text'];
     final Label label = Label(id: labelIndex, text: labelText);
     final confidenceDecimal = map['confidence'];
-    final confidenceText = '${(confidenceDecimal * 100).toStringAsFixed(2)}%';
+    final confidenceText = '${(confidenceDecimal * 100).toStringAsFixed(1)}%';
 
     return Prediction(
       label: label,
@@ -31,7 +31,7 @@ class Prediction {
     final id = map['id'];
     final label = map['label'] ?? Label();
     final confidenceDecimal = map['confidence'];
-    final confidenceText = '${(confidenceDecimal * 100).toStringAsFixed(2)}%';
+    final confidenceText = '${(confidenceDecimal * 100).toStringAsFixed(1)}%';
 
     return Prediction(
       id: id,

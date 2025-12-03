@@ -24,12 +24,28 @@ class ResultsGrid extends StatefulWidget {
 }
 
 class _ResultsGridState extends State<ResultsGrid> {
-  void _showDetailsDialog(BuildContext context, ImageLabelResult result) {
+  late List<ImageLabelResult> _results;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _results = widget.results;
+  }
+
+  void _showDetailsDialog(
+    BuildContext context,
+    ImageLabelResult result,
+    int index,
+  ) {
     showDialog(
       context: context,
       builder: (context) => ResultDetailsDialog(
         result: result,
-        onDelete: () {
+        index: index,
+        onDelete: (index) {
+          _results.removeAt(index);
+          setState(() {});
           widget.onDelete(result);
         },
       ),
@@ -42,7 +58,7 @@ class _ResultsGridState extends State<ResultsGrid> {
       return Center(child: CircularProgressIndicator(color: Colors.blue));
     }
 
-    if (widget.results.isEmpty) {
+    if (_results.isEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -67,23 +83,31 @@ class _ResultsGridState extends State<ResultsGrid> {
           widget.onRefresh!();
         }
       },
-      child: GridView.builder(
-        padding: const EdgeInsets.all(16),
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
-          childAspectRatio: 0.75,
+      child: Semantics(
+        label: 'you have ${_results.length} results',
+        child: GridView.builder(
+          padding: const EdgeInsets.all(16),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            crossAxisSpacing: 16,
+            mainAxisSpacing: 16,
+            childAspectRatio: 0.75,
+          ),
+          itemCount: _results.length,
+          itemBuilder: (context, index) {
+            final result = _results[index];
+        
+            return Semantics(
+              label: 'labeled image number ${index + 1}',
+              hint: 'double tap for details',
+              excludeSemantics: true,
+              child: ResultCard(
+                result: result,
+                onTap: () => _showDetailsDialog(context, result, index),
+              ),
+            );
+          },
         ),
-        itemCount: widget.results.length,
-        itemBuilder: (context, index) {
-          final result = widget.results[index];
-
-          return ResultCard(
-            result: result,
-            onTap: () => _showDetailsDialog(context, result),
-          );
-        },
       ),
     );
   }

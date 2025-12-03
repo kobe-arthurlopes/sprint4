@@ -7,10 +7,10 @@ class GoogleSignInService implements SignInProtocol {
   @override
   Future<String?> getIdToken({String? rawNonce}) async {
     const webClientId =
-        '72772928328-ftfj73lh337k2e3g5u50gn9qrpfo436q.apps.googleusercontent.com';
+        '72772928328-pdlq8ubo216bjdtl0hus3vqrok6fvrsb.apps.googleusercontent.com';
 
     const iosClientId =
-        '72772928328-7ku5bpb4s8t5m89ose46fsqcstp9mqhr.apps.googleusercontent.com';
+        '72772928328-3qr2v9f56s22v022170ivhilt7eqmi12.apps.googleusercontent.com';
 
     final GoogleSignIn signIn = GoogleSignIn.instance;
 
