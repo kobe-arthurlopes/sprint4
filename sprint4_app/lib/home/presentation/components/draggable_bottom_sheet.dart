@@ -167,6 +167,7 @@ class _DraggableBottomSheetState extends State<DraggableBottomSheet>
           ),
       
           Semantics(
+            identifier: 'bottom_sheet_swipe_up_button',
             hint: 'double tap to expand sheet',
             child: IconButton(
               tooltip: 'swipe up',

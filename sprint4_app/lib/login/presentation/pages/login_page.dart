@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:sprint4_app/common/service/authentication/login_method.dart';
-import 'package:sprint4_app/home/presentation/pages/home_page.dart';
 import 'package:sprint4_app/login/data/models/login_data.dart';
 import 'package:sprint4_app/login/presentation/components/login_button.dart';
 import 'package:sprint4_app/login/presentation/components/login_text_field.dart';
@@ -68,8 +67,8 @@ class _LoginPageState extends State<LoginPage> {
       SnackBar(content: Text(loginMessage), backgroundColor: snackBarColor),
     );
 
-    if (isLoginValid) {
-      context.go(HomePage.routeId);
+    if (context.mounted) {
+      context.go('/home');
     }
   }
 
@@ -87,173 +86,172 @@ class _LoginPageState extends State<LoginPage> {
     return ValueListenableBuilder<LoginData>(
       valueListenable: _viewModel.data,
       builder: (_, data, _) {
-        return Semantics(
-          label: '${data.isSignIn ? 'sign in' : 'registration'} page',
-          child: Scaffold(
-            backgroundColor: Colors.black,
-            body: SafeArea(
-              child: Center(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        // Logo - decorativo
-                        Icon(Icons.lock_outline, size: 80, color: Colors.blue),
-                        SizedBox(height: 24),
-          
-                        // Título principal
-                        Text(
-                          data.isSignIn ? 'Welcome!' : 'Register',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 32,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          textAlign: TextAlign.center,
+        return Scaffold(
+          backgroundColor: Colors.black,
+          body: SafeArea(
+            child: Center(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // Logo - decorativo
+                      Icon(Icons.lock_outline, size: 80, color: Colors.blue),
+                      SizedBox(height: 24),
+
+                      // Título principal
+                      Text(
+                        data.isSignIn ? 'Welcome!' : 'Register',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 32,
+                          fontWeight: FontWeight.bold,
                         ),
-                        SizedBox(height: 8),
-          
-                        // Subtítulo
-                        Text(
-                          data.isSignIn
-                              ? 'Enter your credentials to continue.'
-                              : 'Enter your information to register.',
-                          style: TextStyle(color: Colors.grey[400], fontSize: 16),
-                          textAlign: TextAlign.center,
-                        ),
-                        SizedBox(height: 48),
-          
-                        // Campo de Email
-                        LoginTextField(
-                          type: LoginTextFieldOption.email,
-                          controller: _emailController,
-                          validator: _viewModel.validateEmail,
-                        ),
-                        SizedBox(height: 16),
-          
-                        // Campo de Senha
-                        LoginTextField(
-                          type: LoginTextFieldOption.password,
-                          controller: _passwordController,
-                          isVisible: data.isPasswordVisible,
-                          onPressedSuffixIcon:
-                              _viewModel.togglePasswordVisibility,
-                          validator: _viewModel.validatePassword,
-                        ),
-                        SizedBox(height: 24),
-          
-                        // Botão de Login com Email
-                        LoginButton(
-                          method: LoginMethod.email,
-                          onPressed: () async {
-                            print('Login com Email');
-          
-                            _viewModel.setMethod(LoginMethod.email);
-          
-                            final isFormValid =
-                                _formKey.currentState?.validate() ?? false;
-          
-                            await _didPressSignInButton(
-                              context: context,
-                              errorMessage: data.errorMessage,
-                              isFormValid: isFormValid,
-                            );
-                          },
-                          isLoading: data.isLoading,
-                          isSignIn: data.isSignIn,
-                        ),
-                        SizedBox(height: 24),
-          
-                        if (data.isSignIn) ...[
-                          // Divisor
-                          Semantics(
-                            label: 'or sign in with social accounts',
-                            child: Row(
-                              children: [
-                                Expanded(child: Divider(color: Colors.grey[800])),
-                                Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 16),
-                                  child: Text(
-                                    'OR',
-                                    style: TextStyle(color: Colors.grey[600]),
-                                  ),
-                                ),
-                                Expanded(child: Divider(color: Colors.grey[800])),
-                              ],
-                            ),
-                          ),
-                          SizedBox(height: 24),
-          
-                          // Login com Google
-                          LoginButton(
-                            method: LoginMethod.google,
-                            onPressed: () async {
-                              print('Login com google');
-          
-                              _viewModel.setMethod(LoginMethod.google);
-          
-                              await _didPressSignInButton(
-                                context: context,
-                                errorMessage: data.errorMessage,
-                              );
-                            },
-                          ),
-                          SizedBox(height: 16),
-          
-                          // Login com Apple
-                          LoginButton(
-                            method: LoginMethod.apple,
-                            onPressed: () async {
-                              print('Login com Apple');
-          
-                              _viewModel.setMethod(LoginMethod.apple);
-          
-                              await _didPressSignInButton(
-                                context: context,
-                                errorMessage: data.errorMessage,
-                              );
-                            },
-                          ),
-                          SizedBox(height: 32),
-                        ],
-          
-                        // Link para Toggle entre Sign In/Register
-                        MergeSemantics(
+                        textAlign: TextAlign.center,
+                      ),
+                      SizedBox(height: 8),
+
+                      // Subtítulo
+                      Text(
+                        data.isSignIn
+                            ? 'Enter your credentials to continue.'
+                            : 'Enter your information to register.',
+                        style: TextStyle(color: Colors.grey[400], fontSize: 16),
+                        textAlign: TextAlign.center,
+                      ),
+                      SizedBox(height: 48),
+
+                      // Campo de Email
+                      LoginTextField(
+                        type: LoginTextFieldOption.email,
+                        controller: _emailController,
+                        validator: _viewModel.validateEmail,
+                      ),
+                      SizedBox(height: 16),
+
+                      // Campo de Senha
+                      LoginTextField(
+                        type: LoginTextFieldOption.password,
+                        controller: _passwordController,
+                        isVisible: data.isPasswordVisible,
+                        onPressedSuffixIcon:
+                            _viewModel.togglePasswordVisibility,
+                        validator: _viewModel.validatePassword,
+                      ),
+                      SizedBox(height: 24),
+
+                      // Botão de Login com Email
+                      LoginButton(
+                        method: LoginMethod.email,
+                        onPressed: () async {
+                          print('Login com Email');
+
+                          _viewModel.setMethod(LoginMethod.email);
+
+                          final isFormValid =
+                              _formKey.currentState?.validate() ?? false;
+
+                          await _didPressSignInButton(
+                            context: context,
+                            errorMessage: data.errorMessage,
+                            isFormValid: isFormValid,
+                          );
+                        },
+                        isLoading: data.isLoading,
+                        isSignIn: data.isSignIn,
+                      ),
+                      SizedBox(height: 24),
+
+                      if (data.isSignIn) ...[
+                        // Divisor
+                        Semantics(
+                          label: 'or sign in with social accounts',
+                          excludeSemantics: true,
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text(
-                                data.isSignIn
-                                    ? "Don't have an account?"
-                                    : 'Do you want to log in?',
-                                style: TextStyle(color: Colors.grey[400]),
-                              ),
-                              Semantics(
-                                button: true,
-                                hint: 'double tap to ${data.isSignIn ? 'sign up' : 'get back to sign in page'}',
-                                child: GestureDetector(
-                                  onTap: () {
-                                    _viewModel.toggleIsSignIn();
-                                    _resetFields();
-                                  },
-                                  child: Text(
-                                    data.isSignIn ? ' Register' : ' Go back',
-                                    style: TextStyle(
-                                      color: Colors.blue,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
+                              Expanded(child: Divider(color: Colors.grey[800])),
+                              Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 16),
+                                child: Text(
+                                  'OR',
+                                  style: TextStyle(color: Colors.grey[600]),
                                 ),
                               ),
+                              Expanded(child: Divider(color: Colors.grey[800])),
                             ],
                           ),
                         ),
+                        SizedBox(height: 24),
+
+                        // Login com Google
+                        LoginButton(
+                          method: LoginMethod.google,
+                          onPressed: () async {
+                            print('Login com google');
+
+                            _viewModel.setMethod(LoginMethod.google);
+
+                            await _didPressSignInButton(
+                              context: context,
+                              errorMessage: data.errorMessage,
+                            );
+                          },
+                        ),
+                        SizedBox(height: 16),
+
+                        // Login com Apple
+                        LoginButton(
+                          method: LoginMethod.apple,
+                          onPressed: () async {
+                            print('Login com Apple');
+
+                            _viewModel.setMethod(LoginMethod.apple);
+
+                            await _didPressSignInButton(
+                              context: context,
+                              errorMessage: data.errorMessage,
+                            );
+                          },
+                        ),
+                        SizedBox(height: 32),
                       ],
-                    ),
+
+                      // Link para Toggle entre Sign In/Register
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            data.isSignIn
+                                ? "Don't have an account?"
+                                : 'Do you want to log in?',
+                            style: TextStyle(color: Colors.grey[400]),
+                          ),
+                          Semantics(
+                            identifier:
+                                'login_${data.isSignIn ? 'register' : 'back'}',
+                            button: true,
+                            hint:
+                                'double tap to ${data.isSignIn ? 'sign up' : 'get back to sign in page'}',
+                            child: GestureDetector(
+                              onTap: () {
+                                _viewModel.toggleIsSignIn();
+                                _resetFields();
+                              },
+                              child: Text(
+                                data.isSignIn ? ' Register' : ' Go back',
+                                style: TextStyle(
+                                  color: Colors.blue,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
               ),

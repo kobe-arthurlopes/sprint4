@@ -23,5 +23,6 @@ abstract class AuthenticationServiceProtocol {
   bool hasExistingSession();
   Future<AuthResponse?> getSignInResponse();
   Future<AuthResponse?> getSignUpResponse();
+  Future<void> signOut();
   Future<void> run();
 }

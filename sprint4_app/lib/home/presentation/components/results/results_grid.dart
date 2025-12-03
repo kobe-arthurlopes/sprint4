@@ -98,6 +98,7 @@ class _ResultsGridState extends State<ResultsGrid> {
             final result = _results[index];
         
             return Semantics(
+              identifier: 'results_grid_${index + 1}',
               label: 'labeled image number ${index + 1}',
               hint: 'double tap for details',
               excludeSemantics: true,

@@ -7,10 +7,7 @@ import 'package:sprint4_app/common/models/label.dart';
 import 'package:sprint4_app/common/models/prediction.dart';
 
 class ImageLabelingService {
-  static Future<ImageLabelResult> getLabeledImage({
-    required String filePath,
-    bool isTesting = false,
-  }) async {
+  static Future<ImageLabelResult> getLabeledImage({required String filePath}) async {
     if (filePath.isEmpty) return ImageLabelResult();
 
     final file = File(filePath);
@@ -18,16 +15,9 @@ class ImageLabelingService {
     final bytes = await file.readAsBytes();
     final list = bytes.buffer.asUint8List();
     final arguments = {'bytes': list};
-
-    dynamic result;
-
-    if (isTesting) {
-      result = await ImageLabelingService._getMockedPredictionsResult();
-    } else {
-      result = await MethodChannelType.imageLabeling.getResult(
-        arguments: arguments,
-      );
-    }
+    final result = await MethodChannelType.imageLabeling.getResult(
+      arguments: arguments
+    );
 
     final predictions = (result as List)
         .map(
@@ -54,14 +44,5 @@ class ImageLabelingService {
       print('error loading labels.json -> $error');
       return [];
     }
-  }
-
-  static Future<dynamic> _getMockedPredictionsResult() async {
-    final List<Map<String, dynamic>> arguments = [
-      {'index': 360, 'text': 'Dog', 'confidence': 0.9893},
-      {'index': 277, 'text': 'Pet', 'confidence': 0.9621},
-    ];
-
-    return arguments;
   }
 }
