@@ -397,8 +397,10 @@ do <a href="https://developers.google.com/ml-kit" target="_blank">Google ML Kit<
 
 **Testes Automatizados**
 
+- Os testes automatizados foram realizados utilizando o Maestro
+- Abaixo um vídeo demonstrando o fluxo principal do app, com login, criação de imagem classificada e remoção:
 
-https://github.com/user-attachments/assets/f3bafc5a-5161-4b59-9d65-92a9b9a620d9
+https://github.com/user-attachments/assets/edac3573-5179-4b91-b947-c7598d033bc3
 
 ---------
 
