@@ -1,5 +1,7 @@
 ***Sprint 4 App***
 
+<a href="https://drive.google.com/file/d/1lAn6C-X2n3727j5TJQEW9qoignLclj5U/view?usp=share_link">Debug APK</a>
+
 ---------
 
 **Integração nativa**
