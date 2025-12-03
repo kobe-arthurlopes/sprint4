@@ -10,5 +10,11 @@ appId: com.example.sprint4_app
 - tapOn:
     id: image_description_save_button
 - tapOn: swipe up
-
-
+- assertVisible:
+    id: results_grid_1
+- tapOn:
+    id: results_grid_1
+- tapOn: Delete
+- assertNotVisible:
+    id: results_grid_1
+  

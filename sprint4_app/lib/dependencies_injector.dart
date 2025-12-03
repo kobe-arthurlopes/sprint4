@@ -1,7 +1,6 @@
 import 'package:provider/provider.dart';
 import 'package:sprint4_app/common/service/image/image_service.dart';
 import 'package:sprint4_app/common/service/image/image_service_protocol.dart';
-import 'package:sprint4_app/common/service/image/mock_image_service.dart';
 import 'package:sprint4_app/login/data/data_sources/login_data_source.dart';
 import 'package:sprint4_app/login/data/repositories/login_repository.dart';
 import 'package:sprint4_app/login/presentation/view_models/login_view_model.dart';
@@ -14,9 +13,7 @@ import 'package:sprint4_app/home/data/repositories/home_repository.dart';
 import 'package:sprint4_app/home/presentation/view_models/home_view_model.dart';
 
 class DependenciesInjector {
-  final bool isTesting;
-
-  const DependenciesInjector({this.isTesting = false});
+  const DependenciesInjector();
 
   List<Provider> serviceProviders() {
     return [
@@ -54,12 +51,9 @@ class DependenciesInjector {
       Provider<HomeViewModel>(
         create: (context) => HomeViewModel(repository: context.read<HomeRepository>()),
       ),
-      Provider<bool>(
-        create: (_) => isTesting,
-      ),
       Provider<ImageServiceProtocol>(
         create: (_) {
-          return isTesting ? MockImageService() : ImageService();
+          return ImageService();
         },
       ),
     ];

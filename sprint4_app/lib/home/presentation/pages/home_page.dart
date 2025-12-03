@@ -23,14 +23,12 @@ class HomePage extends StatefulWidget {
 class _MyHomePageState extends State<HomePage> with TickerProviderStateMixin {
   late final HomeViewModel _viewModel;
   late final ImageServiceProtocol _imageService;
-  late final bool _isTesting;
 
   @override
   void initState() {
     super.initState();
     _viewModel = context.read<HomeViewModel>();
     _imageService = context.read<ImageServiceProtocol>();
-    _isTesting = context.read<bool>();
     _initialize();
   }
 
@@ -46,7 +44,6 @@ class _MyHomePageState extends State<HomePage> with TickerProviderStateMixin {
 
     final result = await _viewModel.upateImageLabelResult(
       filePath: pickedFiled.path,
-      isTesting: _isTesting,
     );
 
     if (result.file == null) return;
