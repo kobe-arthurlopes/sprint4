@@ -406,5 +406,28 @@ https://github.com/user-attachments/assets/edac3573-5179-4b91-b947-c7598d033bc3
 
 **Acessibilidade**
 
-- O aplicativo possui adaptação para o uso de leitores de tela como VoiceOver, especialmente na página de login, onde a maior parte das ações do usuário é esperada. Para isso, o widget nativo Semantic foi usado. Essa tecnologia ajusta elementos, ações e mensagens estejam corretamente expostos. Isso inclui rótulos, hints, agrupamentos semânticos e anúncios de feedback em tempo real.
+- O aplicativo possui adaptação para o uso de leitores de tela como VoiceOver. Para isso, o widget nativo Semantic foi usado. Essa tecnologia ajusta elementos, ações e mensagens estejam corretamente expostos. Isso inclui rótulos, hints, agrupamentos semânticos e anúncios de feedback em tempo real.
+
+
+https://github.com/user-attachments/assets/95a1ad3c-7dd2-437b-b84c-b48b4d252f24
+
+https://github.com/user-attachments/assets/da471d31-d18a-4ca7-8497-fad851925306
+
+https://github.com/user-attachments/assets/93111746-14b9-41b1-8a99-a6455fce8ab7
+
+https://github.com/user-attachments/assets/90b1b3c3-7efe-4bdc-a15c-b99062622863
+
+https://github.com/user-attachments/assets/be06e3ba-2fbe-47ea-ab3c-e533ff851357
+
+https://github.com/user-attachments/assets/1a2ff786-d976-465a-9831-7593eb1f4630
+
+https://github.com/user-attachments/assets/9b7be46e-00aa-4da7-8b2a-79b63637be84
+
+https://github.com/user-attachments/assets/9c6b0f72-b40d-4895-9be6-28a4bcf3d278
+
+
+
+
+
+  
 
