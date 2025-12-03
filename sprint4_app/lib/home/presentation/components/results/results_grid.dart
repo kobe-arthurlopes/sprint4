@@ -95,9 +95,14 @@ class _ResultsGridState extends State<ResultsGrid> {
         itemBuilder: (context, index) {
           final result = _results[index];
 
-          return ResultCard(
-            result: result,
-            onTap: () => _showDetailsDialog(context, result, index),
+          return Semantics(
+            label: 'labeled image number ${index + 1}',
+            hint: 'double tap for details',
+            excludeSemantics: true,
+            child: ResultCard(
+              result: result,
+              onTap: () => _showDetailsDialog(context, result, index),
+            ),
           );
         },
       ),

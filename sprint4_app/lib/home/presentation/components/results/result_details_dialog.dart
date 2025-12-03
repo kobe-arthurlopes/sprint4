@@ -57,38 +57,40 @@ class ResultDetailsDialog extends StatelessWidget {
                       .map(
                         (prediction) => Padding(
                           padding: const EdgeInsets.only(bottom: 12),
-                          child: Row(
-                            children: [
-                              Container(
-                                width: 8,
-                                height: 8,
-                                decoration: BoxDecoration(
-                                  color: Colors.blue,
-                                  shape: BoxShape.circle,
-                                ),
-                              ),
-
-                              SizedBox(width: 12),
-
-                              Expanded(
-                                child: Text(
-                                  prediction.label.text,
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16,
+                          child: MergeSemantics(
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 8,
+                                  height: 8,
+                                  decoration: BoxDecoration(
+                                    color: Colors.blue,
+                                    shape: BoxShape.circle,
                                   ),
                                 ),
-                              ),
-
-                              Text(
-                                '${(prediction.confidenceDecimal * 100).toStringAsFixed(1)}%',
-                                style: TextStyle(
-                                  color: Colors.grey[400],
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
+                            
+                                SizedBox(width: 12),
+                            
+                                Expanded(
+                                  child: Text(
+                                    prediction.label.text,
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ],
+                            
+                                Text(
+                                  prediction.confidenceText,
+                                  style: TextStyle(
+                                    color: Colors.grey[400],
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       )

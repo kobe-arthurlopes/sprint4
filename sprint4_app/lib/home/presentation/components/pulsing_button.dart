@@ -50,7 +50,10 @@ class _PulsingButtonState extends State<PulsingButton> with SingleTickerProvider
           scale: _animation,
           child: SizedBox(
             width: 250,
-            child: Image.asset('assets/images/pic-button.png'),
+            child: Image.asset(
+              'assets/images/pic-button.png',
+              excludeFromSemantics: true,
+            ),
           ),
         ),
       ),

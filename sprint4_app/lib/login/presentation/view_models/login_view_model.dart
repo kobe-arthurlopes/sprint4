@@ -9,19 +9,7 @@ class LoginViewModel {
 
   LoginViewModel({required this.repository});
 
-  Future<bool> isLoginValid({bool? isFormValid}) async {
-    final isAuthenticated = await _login();
-    bool condition = isAuthenticated;
-    final method = data.value.method;
-
-    if (method == LoginMethod.email) {
-      condition = isAuthenticated && (isFormValid ?? false);
-    }
-
-    return condition;
-  }
-
-  Future<bool> _login() async {
+  Future<bool> login() async {
     data.value = data.value.copyWith(isLoading: true);
 
     bool isAuthenticated = false;
@@ -29,7 +17,7 @@ class LoginViewModel {
     try {
       isAuthenticated = await repository.login(data.value);
     } catch (error) {
-      final errorMessage = 'Ocorreu um problema ($error). Tente novamente';
+      final errorMessage = 'An error has occured ($error). Please try again';
       data.value = data.value.copyWith(errorMessage: errorMessage);
     }
 
@@ -56,11 +44,11 @@ class LoginViewModel {
 
   String? validatePassword(String? password) {
     if (password == null || password.isEmpty) {
-      return 'Por favor, insira sua senha';
+      return 'Please, enter your password';
     }
 
     if (password.length < 6) {
-      return 'A senha deve ter pelo menos 6 caracteres';
+      return 'Password must have at least 6 characters';
     }
 
     return null;
@@ -68,11 +56,11 @@ class LoginViewModel {
 
   String? validateEmail(String? email) {
     if (email == null || email.isEmpty) {
-      return 'Por favor, insira seu email';
+      return 'Please, enter your email';
     }
 
     if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email)) {
-      return 'Por favor, insira um email válido';
+      return 'Please, enter a valid email';
     }
 
     return null;

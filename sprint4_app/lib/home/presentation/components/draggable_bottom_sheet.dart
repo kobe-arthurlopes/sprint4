@@ -142,9 +142,9 @@ class _DraggableBottomSheetState extends State<DraggableBottomSheet>
             ),
             child: Icon(Icons.photo_library, color: Colors.white),
           ),
-
+      
           SizedBox(width: 16),
-
+      
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -157,7 +157,7 @@ class _DraggableBottomSheetState extends State<DraggableBottomSheet>
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-
+      
                 Text(
                   'Swipe up',
                   style: TextStyle(color: Colors.grey[400], fontSize: 14),
@@ -165,11 +165,14 @@ class _DraggableBottomSheetState extends State<DraggableBottomSheet>
               ],
             ),
           ),
-
-          IconButton(
-            key: const Key('swipeUpButton'),
-            onPressed: _toggleSheet,
-            icon: Icon(Icons.swipe_up_rounded, color: Colors.white, size: 32),
+      
+          Semantics(
+            hint: 'double tap to expand sheet',
+            child: IconButton(
+              tooltip: 'swipe up',
+              onPressed: _toggleSheet,
+              icon: Icon(Icons.swipe_up_rounded, color: Colors.white, size: 32),
+            ),
           ),
         ],
       ),

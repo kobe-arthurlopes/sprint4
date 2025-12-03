@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sprint4_app/common/models/prediction.dart';
 import 'package:sprint4_app/home/presentation/components/save_dialog.dart';
@@ -42,27 +43,29 @@ class _ImageDescriptionPageState extends State<ImageDescriptionPage> {
 
     for (var prediction in widget.predictions) {
       all.add(
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              prediction.label.text,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
+        MergeSemantics(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                prediction.label.text,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
 
-            Text(
-              prediction.confidenceText,
-              style: TextStyle(
-                color: Colors.white60,
-                fontSize: 14,
-                fontWeight: FontWeight.normal,
+              Text(
+                prediction.confidenceText,
+                style: TextStyle(
+                  color: Colors.white60,
+                  fontSize: 14,
+                  fontWeight: FontWeight.normal,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       );
 
@@ -105,13 +108,17 @@ class _ImageDescriptionPageState extends State<ImageDescriptionPage> {
                           ),
                         ],
                       ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(16),
-                        child: Image.file(
-                          widget.imageFile,
-                          width: double.infinity,
-                          height: 250,
-                          fit: BoxFit.cover,
+                      child: Semantics(
+                        label: 'ML Kit labeled image',
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(16),
+                          child: Image.file(
+                            excludeFromSemantics: true,
+                            widget.imageFile,
+                            width: double.infinity,
+                            height: 250,
+                            fit: BoxFit.cover,
+                          ),
                         ),
                       ),
                     ),
@@ -161,9 +168,16 @@ class _ImageDescriptionPageState extends State<ImageDescriptionPage> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: Text(
-                    'Save',
-                    style: TextStyle(color: Colors.white, fontSize: 16),
+                  child: Semantics(
+                    identifier: 'image_description_save_button',
+                    label: 'save',
+                    hint:
+                        'double tap to save labeled image and its predictions',
+                    excludeSemantics: true,
+                    child: Text(
+                      'Save',
+                      style: TextStyle(color: Colors.white, fontSize: 16),
+                    ),
                   ),
                 ),
               ),

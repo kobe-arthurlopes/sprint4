@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -90,14 +91,18 @@ class _MyHomePageState extends State<HomePage> with TickerProviderStateMixin {
                       ),
                       child: Align(
                         alignment: Alignment.topCenter,
-                        child: Text(
-                          'Tap the button to capture an image from camera',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
+                        child: Semantics(
+                          identifier: 'home_title',
+                          excludeSemantics: true,
+                          child: Text(
+                            'Tap the button to capture an image from camera',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.center,
                           ),
-                          textAlign: TextAlign.center,
                         ),
                       ),
                     ),
@@ -107,24 +112,35 @@ class _MyHomePageState extends State<HomePage> with TickerProviderStateMixin {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          PulsingButton(
-                            onTap: () async {
-                              await _pickImage(source: ImageSource.camera);
-                            },
+                          Semantics(
+                            identifier: 'home_pulsing_button',
+                            label: 'pulsing',
+                            hint: 'double tap to select an image from camera',
+                            button: true,
+                            child: PulsingButton(
+                              onTap: () async {
+                                await _pickImage(source: ImageSource.camera);
+                              },
+                            ),
                           ),
 
                           SizedBox(height: 100),
 
-                          GestureDetector(
-                            onTap: () async {
-                              await _pickImage(source: ImageSource.gallery);
-                            },
-                            child: Text(
-                              'Pick from gallery',
-                              style: TextStyle(
-                                decoration: TextDecoration.underline,
-                                decorationColor: Colors.white,
-                                color: Colors.white,
+                          Semantics(
+                            identifier: 'home_pick_from_gallery',
+                            hint: 'double tap to select an image from gallery',
+                            button: true,
+                            child: GestureDetector(
+                              onTap: () async {
+                                await _pickImage(source: ImageSource.gallery);
+                              },
+                              child: Text(
+                                'Pick from gallery',
+                                style: TextStyle(
+                                  decoration: TextDecoration.underline,
+                                  decorationColor: Colors.white,
+                                  color: Colors.white,
+                                ),
                               ),
                             ),
                           ),
