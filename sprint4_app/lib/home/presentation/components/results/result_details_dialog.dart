@@ -3,11 +3,13 @@ import 'package:sprint4_app/common/models/image_label_result.dart';
 
 class ResultDetailsDialog extends StatelessWidget {
   final ImageLabelResult result;
-  final VoidCallback onDelete;
+  final int index;
+  final void Function(int) onDelete;
 
   const ResultDetailsDialog({
     super.key,
     required this.result,
+    required this.index,
     required this.onDelete,
   });
 
@@ -122,7 +124,7 @@ class ResultDetailsDialog extends StatelessWidget {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {
-                  onDelete();
+                  onDelete(index);
                   Navigator.pop(context);
                 },
                 style: ElevatedButton.styleFrom(

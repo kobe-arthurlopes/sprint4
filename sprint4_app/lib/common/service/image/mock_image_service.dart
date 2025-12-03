@@ -17,11 +17,12 @@ class MockImageService implements ImageServiceProtocol {
 
   @override
   Future<XFile?> pickImage() async {
-    final byteData = await rootBundle.load('images/example_img.jpg');
+    final imageName = 'example_img.jpg';
+    final byteData = await rootBundle.load('assets/images/$imageName');
     final bytes = byteData.buffer.asUint8List();
 
     final tempDir = Directory.systemTemp;
-    final tempFile = File('${tempDir.path}/example_img.jpg');
+    final tempFile = File('${tempDir.path}/$imageName');
     await tempFile.writeAsBytes(bytes, flush: true);
 
     return XFile(tempFile.path);

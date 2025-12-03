@@ -24,12 +24,28 @@ class ResultsGrid extends StatefulWidget {
 }
 
 class _ResultsGridState extends State<ResultsGrid> {
-  void _showDetailsDialog(BuildContext context, ImageLabelResult result) {
+  late List<ImageLabelResult> _results;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _results = widget.results;
+  }
+
+  void _showDetailsDialog(
+    BuildContext context,
+    ImageLabelResult result,
+    int index,
+  ) {
     showDialog(
       context: context,
       builder: (context) => ResultDetailsDialog(
         result: result,
-        onDelete: () {
+        index: index,
+        onDelete: (index) {
+          _results.removeAt(index);
+          setState(() {});
           widget.onDelete(result);
         },
       ),
@@ -42,7 +58,7 @@ class _ResultsGridState extends State<ResultsGrid> {
       return Center(child: CircularProgressIndicator(color: Colors.blue));
     }
 
-    if (widget.results.isEmpty) {
+    if (_results.isEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -75,13 +91,13 @@ class _ResultsGridState extends State<ResultsGrid> {
           mainAxisSpacing: 16,
           childAspectRatio: 0.75,
         ),
-        itemCount: widget.results.length,
+        itemCount: _results.length,
         itemBuilder: (context, index) {
-          final result = widget.results[index];
+          final result = _results[index];
 
           return ResultCard(
             result: result,
-            onTap: () => _showDetailsDialog(context, result),
+            onTap: () => _showDetailsDialog(context, result, index),
           );
         },
       ),

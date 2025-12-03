@@ -85,7 +85,6 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: const Key('imagePickerScaffold'),
       backgroundColor: Color(0xFF121212),
       body: Stack(
         children: [

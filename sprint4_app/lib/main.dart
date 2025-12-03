@@ -42,6 +42,7 @@ class MyApp extends StatelessWidget {
 
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
+      theme: ThemeData(fontFamily: 'Poppins'),
       routerConfig: Routes().config(initialLocation: initialRouterLocation),
     );
   }

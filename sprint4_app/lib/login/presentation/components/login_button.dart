@@ -92,7 +92,7 @@ class LoginButton extends StatelessWidget {
         children: [
           method == LoginMethod.google
               ? Image.asset(
-                  'images/google_icon.png',
+                  'assets/images/google_icon.png',
                   width: 20,
                   fit: BoxFit.cover,
                 )

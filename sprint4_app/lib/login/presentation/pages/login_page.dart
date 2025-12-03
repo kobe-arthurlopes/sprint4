@@ -66,14 +66,14 @@ class _LoginPageState extends State<LoginPage> {
     if (!context.mounted) return;
 
     // Anuncia resultado ao leitor de tela
-    SemanticsService.sendAnnouncement(View.of(context), loginMessage, TextDirection.ltr);
+    // SemanticsService.sendAnnouncement(View.of(context), loginMessage, TextDirection.ltr);
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(loginMessage), backgroundColor: snackBarColor),
     );
 
     if (isLoginValid) {
-      SemanticsService.sendAnnouncement(View.of(context), 'Redirecting to home page', TextDirection.ltr);
+      // SemanticsService.sendAnnouncement(View.of(context), 'Redirecting to home page', TextDirection.ltr);
       context.go(HomePage.routeId);
     }
   }
@@ -87,7 +87,7 @@ class _LoginPageState extends State<LoginPage> {
     }
 
     // Anuncia reset dos campos
-    SemanticsService.sendAnnouncement(View.of(context), 'Form fields have been reset', TextDirection.ltr);
+    // SemanticsService.sendAnnouncement(View.of(context), 'Form fields have been reset', TextDirection.ltr);
   }
 
   @override
@@ -157,10 +157,10 @@ class _LoginPageState extends State<LoginPage> {
                             validator: (value) {
                               final error = _viewModel.validateEmail(value);
                               if (error != null) {
-                                SemanticsService.sendAnnouncement(View.of(context), 
-                                  'Email validation error: $error',
-                                  TextDirection.ltr,
-                                );
+                                // SemanticsService.sendAnnouncement(View.of(context), 
+                                //   'Email validation error: $error',
+                                //   TextDirection.ltr,
+                                // );
                               }
                               return error;
                             },
@@ -180,18 +180,18 @@ class _LoginPageState extends State<LoginPage> {
                               _viewModel.togglePasswordVisibility();
                               
                               // Anuncia mudança de visibilidade
-                              final message = !data.isPasswordVisible
-                                  ? 'Password is now visible'
-                                  : 'Password is now hidden';
-                              SemanticsService.sendAnnouncement(View.of(context), message, TextDirection.ltr);
+                              // final message = !data.isPasswordVisible
+                              //     ? 'Password is now visible'
+                              //     : 'Password is now hidden';
+                              // SemanticsService.sendAnnouncement(View.of(context), message, TextDirection.ltr);
                             },
                             validator: (value) {
                               final error = _viewModel.validatePassword(value);
                               if (error != null) {
-                                SemanticsService.sendAnnouncement(View.of(context), 
-                                  'Password validation error: $error',
-                                  TextDirection.ltr,
-                                );
+                                // SemanticsService.sendAnnouncement(View.of(context), 
+                                //   'Password validation error: $error',
+                                //   TextDirection.ltr,
+                                // );
                               }
                               return error;
                             },
@@ -208,17 +208,17 @@ class _LoginPageState extends State<LoginPage> {
 
                             final isFormValid = _formKey.currentState?.validate();
 
-                            if (isFormValid == false) {
-                              SemanticsService.sendAnnouncement(View.of(context), 
-                                'Form has errors. Please correct them and try again',
-                                TextDirection.ltr,
-                              );
-                            } else {
-                              SemanticsService.sendAnnouncement(View.of(context), 
-                                'Processing sign in with email',
-                                TextDirection.ltr,
-                              );
-                            }
+                            // if (isFormValid == false) {
+                            //   SemanticsService.sendAnnouncement(View.of(context), 
+                            //     'Form has errors. Please correct them and try again',
+                            //     TextDirection.ltr,
+                            //   );
+                            // } else {
+                            //   SemanticsService.sendAnnouncement(View.of(context), 
+                            //     'Processing sign in with email',
+                            //     TextDirection.ltr,
+                            //   );
+                            // }
 
                             await _didPressSignInButton(
                               context: context,
@@ -264,10 +264,10 @@ class _LoginPageState extends State<LoginPage> {
                           LoginButton(
                             method: LoginMethod.google,
                             onPressed: () async {
-                              SemanticsService.sendAnnouncement(View.of(context), 
-                                'Opening Google sign in',
-                                TextDirection.ltr,
-                              );
+                              // SemanticsService.sendAnnouncement(View.of(context), 
+                              //   'Opening Google sign in',
+                              //   TextDirection.ltr,
+                              // );
                               
                               _viewModel.setMethod(LoginMethod.google);
                               await _didPressSignInButton(
@@ -284,10 +284,10 @@ class _LoginPageState extends State<LoginPage> {
                             onPressed: () async {
                               print('Login com Apple');
 
-                              SemanticsService.sendAnnouncement(View.of(context), 
-                                'Opening Apple sign in',
-                                TextDirection.ltr,
-                              );
+                              // SemanticsService.sendAnnouncement(View.of(context), 
+                              //   'Opening Apple sign in',
+                              //   TextDirection.ltr,
+                              // );
 
                               _viewModel.setMethod(LoginMethod.apple);
 
@@ -313,10 +313,10 @@ class _LoginPageState extends State<LoginPage> {
                             _viewModel.toggleIsSignIn();
                             _resetFields();
                             
-                            final message = data.isSignIn
-                                ? 'Switched to registration page'
-                                : 'Switched to sign in page';
-                            SemanticsService.sendAnnouncement(View.of(context), message, TextDirection.ltr);
+                            // final message = data.isSignIn
+                            //     ? 'Switched to registration page'
+                            //     : 'Switched to sign in page';
+                            // SemanticsService.sendAnnouncement(View.of(context), message, TextDirection.ltr);
                           },
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -334,10 +334,10 @@ class _LoginPageState extends State<LoginPage> {
                                   _viewModel.toggleIsSignIn();
                                   _resetFields();
                                   
-                                  final message = data.isSignIn
-                                      ? 'Switched to registration page'
-                                      : 'Switched to sign in page';
-                                  SemanticsService.sendAnnouncement(View.of(context), message, TextDirection.ltr);
+                                  // final message = data.isSignIn
+                                  //     ? 'Switched to registration page'
+                                  //     : 'Switched to sign in page';
+                                  // SemanticsService.sendAnnouncement(View.of(context), message, TextDirection.ltr);
                                 },
                                 child: ExcludeSemantics(
                                   child: Text(
