@@ -231,7 +231,7 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                           Semantics(
                             identifier:
-                                'home_${data.isSignIn ? 'register' : 'back'}',
+                                'login_${data.isSignIn ? 'register' : 'back'}',
                             button: true,
                             hint:
                                 'double tap to ${data.isSignIn ? 'sign up' : 'get back to sign in page'}',

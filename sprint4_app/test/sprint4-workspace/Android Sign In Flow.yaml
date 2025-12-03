@@ -1,0 +1,11 @@
+appId: com.example.sprint4_app
+---
+- launchApp:
+    clearState: true
+- tapOn: Email
+- inputText: ${email}
+- tapOn: Password
+- inputText: ${password}
+- tapOn: Login
+- assertVisible:
+    id: home
