@@ -408,7 +408,7 @@ https://github.com/user-attachments/assets/edac3573-5179-4b91-b947-c7598d033bc3
 
 - O aplicativo possui adaptação para o uso de leitores de tela como VoiceOver. Para isso, o widget nativo Semantic foi usado. Essa tecnologia ajusta elementos, ações e mensagens estejam corretamente expostos. Isso inclui rótulos, hints, agrupamentos semânticos e anúncios de feedback em tempo real.
   
-- Acompanhe o vídeo da demo do VoiceOver (foi dividido em várias partes para caber do README):
+- Acompanhe o vídeo da demo do VoiceOver (foi dividido em várias partes para caber no README):
 
 
 https://github.com/user-attachments/assets/95a1ad3c-7dd2-437b-b84c-b48b4d252f24
