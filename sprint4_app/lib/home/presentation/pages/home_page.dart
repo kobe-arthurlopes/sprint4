@@ -76,98 +76,101 @@ class _MyHomePageState extends State<HomePage> with TickerProviderStateMixin {
     return ValueListenableBuilder<HomeData>(
       valueListenable: _viewModel.data,
       builder: (_, data, _) {
-        return Scaffold(
-          backgroundColor: Color(0xFF121212),
-          body: Stack(
-            children: [
-              SafeArea(
-                child: Stack(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 50,
-                        horizontal: 20,
-                      ),
-                      child: Align(
-                        alignment: Alignment.topCenter,
-                        child: Semantics(
-                          identifier: 'home_title',
-                          excludeSemantics: true,
-                          child: Text(
-                            'Tap the button to capture an image from camera',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
+        return Semantics(
+          label: 'home page',
+          child: Scaffold(
+            backgroundColor: Color(0xFF121212),
+            body: Stack(
+              children: [
+                SafeArea(
+                  child: Stack(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 50,
+                          horizontal: 20,
+                        ),
+                        child: Align(
+                          alignment: Alignment.topCenter,
+                          child: Semantics(
+                            identifier: 'home_title',
+                            excludeSemantics: true,
+                            child: Text(
+                              'Tap the button to capture an image from camera',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              textAlign: TextAlign.center,
                             ),
-                            textAlign: TextAlign.center,
                           ),
                         ),
                       ),
-                    ),
-
-                    Align(
-                      alignment: Alignment.center,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Semantics(
-                            identifier: 'home_pulsing_button',
-                            label: 'pulsing',
-                            hint: 'double tap to select an image from camera',
-                            button: true,
-                            child: PulsingButton(
-                              onTap: () async {
-                                await _pickImage(source: ImageSource.camera);
-                              },
+          
+                      Align(
+                        alignment: Alignment.center,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Semantics(
+                              identifier: 'home_pulsing_button',
+                              label: 'pulsing',
+                              hint: 'double tap to select an image from camera',
+                              button: true,
+                              child: PulsingButton(
+                                onTap: () async {
+                                  await _pickImage(source: ImageSource.camera);
+                                },
+                              ),
                             ),
-                          ),
-
-                          SizedBox(height: 100),
-
-                          Semantics(
-                            identifier: 'home_pick_from_gallery',
-                            hint: 'double tap to select an image from gallery',
-                            button: true,
-                            child: GestureDetector(
-                              onTap: () async {
-                                await _pickImage(source: ImageSource.gallery);
-                              },
-                              child: Text(
-                                'Pick from gallery',
-                                style: TextStyle(
-                                  decoration: TextDecoration.underline,
-                                  decorationColor: Colors.white,
-                                  color: Colors.white,
+          
+                            SizedBox(height: 100),
+          
+                            Semantics(
+                              identifier: 'home_pick_from_gallery',
+                              hint: 'double tap to select an image from gallery',
+                              button: true,
+                              child: GestureDetector(
+                                onTap: () async {
+                                  await _pickImage(source: ImageSource.gallery);
+                                },
+                                child: Text(
+                                  'Pick from gallery',
+                                  style: TextStyle(
+                                    decoration: TextDecoration.underline,
+                                    decorationColor: Colors.white,
+                                    color: Colors.white,
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: DraggableBottomSheet(
-                  expandedContent: ResultsGrid(
-                    results: data.results,
-                    isLoading: data.isLoading,
-                    emptyMessage: 'No results found',
-                    onRefresh: () async {
-                      await _viewModel.fetch();
-                    },
-                    onDelete: (result) async {
-                      await _viewModel.deleteResult(result);
-                      await _viewModel.fetch(shouldLoad: false);
-                    },
+                    ],
                   ),
                 ),
-              ),
-            ],
+          
+                Align(
+                  alignment: Alignment.bottomCenter,
+                  child: DraggableBottomSheet(
+                    expandedContent: ResultsGrid(
+                      results: data.results,
+                      isLoading: data.isLoading,
+                      emptyMessage: 'No results found',
+                      onRefresh: () async {
+                        await _viewModel.fetch();
+                      },
+                      onDelete: (result) async {
+                        await _viewModel.deleteResult(result);
+                        await _viewModel.fetch(shouldLoad: false);
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         );
       },

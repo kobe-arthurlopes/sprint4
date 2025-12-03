@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter/semantics.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sprint4_app/common/models/prediction.dart';
 import 'package:sprint4_app/home/presentation/components/save_dialog.dart';
@@ -90,7 +89,7 @@ class _ImageDescriptionPageState extends State<ImageDescriptionPage> {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 CloseButton(color: Colors.white, onPressed: context.pop),
-
+    
                 Padding(
                   padding: const EdgeInsets.symmetric(
                     vertical: 10,
@@ -126,7 +125,7 @@ class _ImageDescriptionPageState extends State<ImageDescriptionPage> {
                 ),
               ],
             ),
-
+    
             Expanded(
               child: SingleChildScrollView(
                 child: Column(
@@ -146,7 +145,7 @@ class _ImageDescriptionPageState extends State<ImageDescriptionPage> {
                 ),
               ),
             ),
-
+    
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
               child: SizedBox(
@@ -155,9 +154,9 @@ class _ImageDescriptionPageState extends State<ImageDescriptionPage> {
                   onPressed: () async {
                     _showSavingDialog(context);
                     await widget.onSave();
-
+    
                     if (!context.mounted) return;
-
+    
                     Navigator.of(context).pop();
                     context.pop();
                   },

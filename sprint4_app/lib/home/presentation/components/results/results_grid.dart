@@ -83,28 +83,31 @@ class _ResultsGridState extends State<ResultsGrid> {
           widget.onRefresh!();
         }
       },
-      child: GridView.builder(
-        padding: const EdgeInsets.all(16),
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
-          childAspectRatio: 0.75,
+      child: Semantics(
+        label: 'you have ${_results.length} results',
+        child: GridView.builder(
+          padding: const EdgeInsets.all(16),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            crossAxisSpacing: 16,
+            mainAxisSpacing: 16,
+            childAspectRatio: 0.75,
+          ),
+          itemCount: _results.length,
+          itemBuilder: (context, index) {
+            final result = _results[index];
+        
+            return Semantics(
+              label: 'labeled image number ${index + 1}',
+              hint: 'double tap for details',
+              excludeSemantics: true,
+              child: ResultCard(
+                result: result,
+                onTap: () => _showDetailsDialog(context, result, index),
+              ),
+            );
+          },
         ),
-        itemCount: _results.length,
-        itemBuilder: (context, index) {
-          final result = _results[index];
-
-          return Semantics(
-            label: 'labeled image number ${index + 1}',
-            hint: 'double tap for details',
-            excludeSemantics: true,
-            child: ResultCard(
-              result: result,
-              onTap: () => _showDetailsDialog(context, result, index),
-            ),
-          );
-        },
       ),
     );
   }

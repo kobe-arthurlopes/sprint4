@@ -5,6 +5,7 @@ class LoginButton extends StatelessWidget {
   final LoginMethod method;
   final VoidCallback onPressed;
   final bool isLoading;
+  final bool isSignIn;
 
   late final Color _backgroundColor = method == LoginMethod.email
       ? Colors.blue
@@ -18,12 +19,16 @@ class LoginButton extends StatelessWidget {
     required this.method,
     required this.onPressed,
     this.isLoading = false,
+    this.isSignIn = true,
   });
 
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      onPressed: isLoading ? null : onPressed,
+      onPressed: () {
+        if (isLoading) return;
+        onPressed();
+      },
       style: ElevatedButton.styleFrom(
         backgroundColor: _backgroundColor,
         padding: const EdgeInsets.symmetric(vertical: 16),
@@ -45,46 +50,44 @@ class LoginButton extends StatelessWidget {
   }
 
   Widget _buildEmailButtonContent() {
-    if (isLoading) {
-      return SizedBox(
-        height: 20,
-        width: 20,
-        child: CircularProgressIndicator(
-          color: Colors.white,
-          strokeWidth: 2,
-        ),
-      );
-    }
-
-    return Semantics(
-      child: Text(
-        'Login',
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: 16,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
+    return Center(
+      child: isLoading
+          ? SizedBox(
+              height: 20,
+              width: 20,
+              child: CircularProgressIndicator(
+                color: Colors.white,
+                strokeWidth: 2,
+              ),
+            )
+          : Text(
+              isSignIn ? 'Login' : 'Register',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
     );
   }
 
   Widget _buildSocialButtonContent() {
     final providerName = method == LoginMethod.google ? 'Google' : 'Apple';
-    
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         method == LoginMethod.google
             ? Image.asset(
-              excludeFromSemantics: true,
+                excludeFromSemantics: true,
                 'assets/images/google_icon.png',
                 width: 20,
                 fit: BoxFit.cover,
               )
             : Icon(Icons.apple, size: 26, color: Colors.white),
-        
+
         SizedBox(width: 5),
-        
+
         Text(
           'Sign in with $providerName',
           style: TextStyle(color: Colors.white, fontSize: 16),
