@@ -48,11 +48,17 @@ class _PulsingButtonState extends State<PulsingButton> with SingleTickerProvider
       child: Center(
         child: ScaleTransition(
           scale: _animation,
-          child: SizedBox(
-            width: 250,
-            child: Image.asset(
-              'assets/images/pic-button.png',
-              excludeFromSemantics: true,
+          child: Semantics(
+            identifier: 'home_pulsing_button',
+            label: 'pulsing',
+            hint: 'tap to open camera',
+            button: true,
+            child: SizedBox(
+              width: 250,
+              child: Image.asset(
+                'assets/images/pic-button.png',
+                excludeFromSemantics: true,
+              ),
             ),
           ),
         ),
